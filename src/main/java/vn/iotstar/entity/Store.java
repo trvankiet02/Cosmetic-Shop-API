@@ -1,16 +1,15 @@
 package vn.iotstar.entity;
 
-
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -28,28 +27,33 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "[User]")
-public class User {
-	
+@Table(name = "[Store]")
+public class Store {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	private String email;
+	@Column(columnDefinition = "nvarchar(255)")
+	private String name;
 	
-	private String password;
-	
-	@Column(columnDefinition = "nvarchar(50)")
-	private String firstName;
-	
-	@Column(columnDefinition = "nvarchar(50)")
-	private String lastName;
+	@Column(columnDefinition = "nvarchar(255)")
+	private String address;
 	
 	private String phone;
 	
-	private String profileImage;
+	private String email;
 	
-	private Boolean role;
+	//private int userId;
+	@OneToOne
+	@JoinColumn(name = "userId")
+	private User user;
+	
+	private String storeImage;
+	
+	private String featureImage;
+	
+	private float rating;
 	
 	private Integer eWallet;
 	
@@ -61,35 +65,19 @@ public class User {
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
 	private Date updateAt;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
-	private Date lastLogin;
-	
-	//mapping to address
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	private List<Address> addresses;
-	
-	//mapping to store
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
-	private Store store;
-	
-	//mapping to UserFolowStore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	//mapping to UserFolowSore
+	@OneToMany(mappedBy = "store")
 	private List<UserFollowStore> userFollowStores;
 	
-	//mapping to UserFollowProduct
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	private List<UserFollowProduct> userFollowProducts;
+	//mapping to Product
+	@OneToMany(mappedBy = "store")
+	private List<Product> products;
 	
 	//mapping to Cart
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	@OneToMany(mappedBy = "store")
 	private List<Cart> carts;
 	
-	//mapping to Order
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	//mapping to order
+	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
-	
-	//mapping to Review
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	private List<Review> reviews;
 }
