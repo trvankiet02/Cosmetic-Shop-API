@@ -15,6 +15,9 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +34,7 @@ public class ProductImage {
 	private Integer id;
 	
 	//private int productId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "productId")
 	private Product product;

@@ -21,6 +21,9 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -56,16 +59,19 @@ public class Product {
 	private String madeIn;
 	
 	//private int styleId;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "styleId")
 	private Style style;
 	
 	//private int categoryId;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "categoryId")
 	private Category category;
 	
 	//private int storeId;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "storeId")
 	private Store store;
@@ -79,22 +85,27 @@ public class Product {
 	private Date updateAt;
 	
 	//mapping to Product Image
+	@JsonManagedReference
 	@OneToMany(mappedBy = "product")
 	private List<ProductImage> productImages;
 	
 	//mapping to ProductQuantity
+	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	private List<ProductQuantity> productQuantities;
 	
 	//mapping to UserFollowProduct
+	@JsonIgnore
 	@ManyToMany(mappedBy = "product")
 	private List<UserFollowProduct> userFollowProducts;
 	
 	//mapping to CartItem
+	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	private List<CartItem> cartItems;
 	
 	//mapping to Product
+	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	private List<Review> reviews;
 }

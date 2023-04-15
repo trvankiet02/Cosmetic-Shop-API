@@ -19,6 +19,8 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -74,6 +76,7 @@ public class Store {
 	private List<Product> products;
 	
 	//mapping to Cart
+	@JsonIgnore
 	@OneToMany(mappedBy = "store")
 	private List<Cart> carts;
 	

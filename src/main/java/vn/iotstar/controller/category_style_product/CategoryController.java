@@ -37,8 +37,8 @@ public class CategoryController {
 	private Cloudinary cloudinary;
 
 	@GetMapping
-	public List<Category> getAllCategory() {
-		return categoryRepository.findAll();
+	public ResponseEntity<?> getAllCategory() {
+		return ResponseEntity.ok().body(categoryRepository.findAll());
 	}
 
 	@PostMapping(path = "/getCategory")

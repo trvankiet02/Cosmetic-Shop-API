@@ -17,6 +17,8 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,10 +48,12 @@ public class Category {
 	private Date updateAt;
 	
 	//mapping to Style
+	@JsonIgnore
 	@OneToMany(mappedBy = "category")
 	private List<Style> styles;
 	
 	//mapping to product
+	@JsonIgnore
 	@OneToMany(mappedBy = "category")
 	private List<Product> products;
 }

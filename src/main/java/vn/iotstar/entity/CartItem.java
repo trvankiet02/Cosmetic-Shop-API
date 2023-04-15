@@ -16,6 +16,8 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -54,6 +56,7 @@ public class CartItem {
 	private Date updateAt;
 	
 	//mapping to cartItem
+	@JsonIgnore
 	@OneToOne(mappedBy = "cartItem")
 	private OrderItem orderItem;
 }
