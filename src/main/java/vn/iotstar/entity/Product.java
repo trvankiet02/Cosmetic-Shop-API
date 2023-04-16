@@ -92,6 +92,7 @@ public class Product {
 	
 	//mapping to ProductQuantity
 	@JsonIgnore
+	@JsonManagedReference
 	@OneToMany(mappedBy = "product")
 	private List<ProductQuantity> productQuantities;
 	

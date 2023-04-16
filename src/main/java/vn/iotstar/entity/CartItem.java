@@ -1,6 +1,5 @@
 package vn.iotstar.entity;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -16,6 +15,7 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -34,6 +34,7 @@ public class CartItem {
 	private Integer id;
 	
 	//private int cartId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "cartId")
 	private Cart cart;

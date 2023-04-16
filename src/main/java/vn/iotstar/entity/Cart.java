@@ -19,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -56,6 +57,7 @@ public class Cart {
 	private Date updateAt;
 	
 	//mapping to CartItem
+	@JsonManagedReference
 	@OneToMany(mappedBy = "cart")
 	private List<CartItem> cartItems;
 }
