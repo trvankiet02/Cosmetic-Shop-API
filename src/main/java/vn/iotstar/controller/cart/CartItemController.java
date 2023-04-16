@@ -60,11 +60,11 @@ public class CartItemController {
 			@Validated @RequestParam("quantity") Integer quantity){
 		Optional<User> optUser = userRepository.findById(userId);
 		Optional<Product> optProduct = productRepository.findById(productId);
-		List<ProductQuantity> productQuantityList = productQuantityRepository.findByProduct(optProduct.get());
 		Optional<Store> optStore = storeRepository.findByProducts(optProduct.get());
 		Optional<Cart> optCart = cartRepository.findByUserAndStore(optUser.get(), optStore.get());
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		CartItem cartItem = new CartItem();
+		Boolean flag = false;
 		
 		if (optCart.isEmpty()) {
 			optCart = optCart.ofNullable(new Cart());			
@@ -72,21 +72,36 @@ public class CartItemController {
 			optCart.get().setUser(optUser.get());
 			optCart.get().setStore(optStore.get());
 			optCart.get().setCreateAt(timestamp);
-		} 
-		
+			
+
+			cartRepository.save(optCart.get());
+		} 	
+		optCart = cartRepository.findByUserAndStore(optUser.get(), optStore.get());
 		optCart.get().setUpdateAt(timestamp);
 		
+		List<CartItem> cartItemList = optCart.get().getCartItems();
+		
+		if (cartItemList.size() != 0) {
+			for (CartItem cI : cartItemList) {
+				if (cI.getProduct().getId() == productId && cI.getSize().trim().equals(size.trim())) {
+					cI.setQuantity(cI.getQuantity() + quantity);
+					cartItem = cI;
+					flag = true;
+					break;
+				}
+			}
+		} 
+		if (flag == false) {
+			cartItem.setCreateAt(timestamp);
+			cartItem.setProduct(optProduct.get());
+			cartItem.setCart(optCart.get());
+			cartItem.setQuantity(quantity);
+			cartItem.setSize(size);
+			
+			cartItemRepository.save(cartItem);
+		}
+		
 		cartRepository.save(optCart.get());
-		
-		optCart = cartRepository.findByUserAndStore(optUser.get(), optStore.get());
-		
-		cartItem.setCart(optCart.get());
-		cartItem.setProduct(optProduct.get());
-		cartItem.setSize(size);
-		cartItem.setQuantity(quantity);
-		cartItem.setCreateAt(timestamp);
-		
-		cartItemRepository.save(cartItem);
 		
 		return ResponseEntity.ok().body(cartItem);
 	}
