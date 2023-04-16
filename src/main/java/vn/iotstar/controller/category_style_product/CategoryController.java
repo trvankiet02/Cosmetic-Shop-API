@@ -24,7 +24,10 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
 import vn.iotstar.entity.Category;
+import vn.iotstar.entity.Product;
+import vn.iotstar.entity.Style;
 import vn.iotstar.repository.CategoryRepository;
+import vn.iotstar.repository.StyleRepository;
 
 @RestController
 @RequestMapping(path = "/api/category")
@@ -32,6 +35,9 @@ public class CategoryController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private StyleRepository styleRepository;
 
 	@Autowired
 	private Cloudinary cloudinary;
@@ -49,6 +55,22 @@ public class CategoryController {
 			return ResponseEntity.ok().body(category.get());
 		} else {
 			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@PostMapping(path = "/getCategoryByStyle")
+	public ResponseEntity<?> getCategoryByStyle(@Validated @RequestParam("styleId") Integer styleId){
+		Optional<Style> optStyle = styleRepository.findById(styleId);
+		
+		if (optStyle.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại phong cách này không tồn tại trong hệ thống");
+		} else {
+			List<Category> categoryList = categoryRepository.findByStyles(optStyle.get());
+			if (categoryList.size() == 0) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+			} else {
+				return ResponseEntity.ok().body(categoryList);
+			}
 		}
 	}
 

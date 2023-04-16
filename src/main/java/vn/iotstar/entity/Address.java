@@ -15,6 +15,8 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +33,7 @@ public class Address {
 	private Integer id;
 	
 	//private int userId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "userId")
 	private User user;

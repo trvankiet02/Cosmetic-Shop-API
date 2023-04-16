@@ -2,6 +2,7 @@ package vn.iotstar.controller.category_style_product;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.ProductImage;
 import vn.iotstar.entity.Style;
@@ -64,6 +66,38 @@ public class ProductController {
 			return ResponseEntity.ok().body(product.get());
 		} else {
 			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@PostMapping(path = "/getProductByCategory")
+	public ResponseEntity<?> getProductByCategory(@Validated @RequestParam("categoryId") Integer categoryId){
+		Optional<Category> optCategory = categoryRepository.findById(categoryId);
+		
+		if (optCategory.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không tồn tại trong hệ thống");
+		} else {
+			List<Product> productList = productRepository.findByCategory(optCategory.get());
+			if (productList.size() == 0) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+			} else {
+				return ResponseEntity.ok().body(productList);
+			}
+		}
+	}
+	
+	@PostMapping(path = "/getProductByStyle")
+	public ResponseEntity<?> getProductByStyle(@Validated @RequestParam("styleId") Integer styleId){
+		Optional<Style> optStyle = styleRepository.findById(styleId);
+		
+		if (optStyle.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại phong cách này không tồn tại trong hệ thống");
+		} else {
+			List<Product> productList = productRepository.findByStyle(optStyle.get());
+			if (productList.size() == 0) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+			} else {
+				return ResponseEntity.ok().body(productList);
+			}
 		}
 	}
 	

@@ -12,5 +12,6 @@ import vn.iotstar.entity.Style;
 public interface StyleRepository extends JpaRepository<Style, Integer>{
 
 	Optional<Style> findByName(String name);
+	
 
 }

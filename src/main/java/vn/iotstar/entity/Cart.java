@@ -17,6 +17,7 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -35,11 +36,13 @@ public class Cart {
 	private Integer id;
 	
 	//private int userId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "userId")
 	private User user;
 	
 	//private int storeId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "storeId")
 	private Store store;
