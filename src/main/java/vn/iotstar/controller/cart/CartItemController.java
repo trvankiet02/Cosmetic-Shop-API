@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,18 @@ public class CartItemController {
 	@PostMapping(path = "/getCartItem")
 	public ResponseEntity<?> getCartItem(){
 		return ResponseEntity.ok().body(cartItemRepository.findAll());
+	}
+	
+	@PostMapping(path = "/deleteCartItem")
+	public ResponseEntity<?> deleteCartItem(@Validated @RequestParam("cartItemId") Integer cartItemId){
+		Optional<CartItem> optCartItem = cartItemRepository.findById(cartItemId);
+		
+		if (optCartItem.isPresent()) {
+			cartItemRepository.delete(optCartItem.get());
+			return ResponseEntity.ok().body("Xoá sản phẩm trong giỏ hàng thành công");
+		}
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quá trình xử lý gặp lỗi");
 	}
 	
 	@PostMapping(path = "/addCartItem")

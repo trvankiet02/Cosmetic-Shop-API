@@ -76,18 +76,22 @@ public class User {
 	private Store store;
 	
 	//mapping to UserFolowStore
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
 	private List<UserFollowStore> userFollowStores;
 	
 	//mapping to UserFollowProduct
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
 	private List<UserFollowProduct> userFollowProducts;
 	
 	//mapping to Cart
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
 	private List<Cart> carts;
 	
 	//mapping to Order
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
 	private List<Order> orders;
 	
