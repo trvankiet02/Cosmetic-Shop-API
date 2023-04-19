@@ -16,6 +16,10 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,12 +36,14 @@ public class OrderItem {
 	private Integer id;
 	
 	//private int orderId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "orderId")
 	private Order order;
 	
 	//private int cartItemId;
 	@OneToOne
+	@JsonIgnore
 	@JoinColumn(name = "cartItemId")
 	private CartItem cartItem;
 	

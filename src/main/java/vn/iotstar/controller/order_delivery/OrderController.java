@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -52,85 +54,82 @@ public class OrderController {
 	@Autowired
 	private StoreRepository storeRepository;
 
-	private EntityManager entityManager;
-
 	@GetMapping
 	public ResponseEntity<?> getAllOrder() {
 		return ResponseEntity.ok().body(orderRepository.findAll());
 	}
 
+	@PostMapping(path = "/getOrder")
+	public ResponseEntity<?> getOrder(@Validated @RequestParam("userId") Integer userId,
+			@Validated @RequestParam("status") Integer status) {
+		Optional<User> optUser = userRepository.findById(userId);
+
+		return ResponseEntity.ok().body(orderRepository.findByUserAndStatus(optUser.get(), status));
+	}
+	
 	@PostMapping(path = "/addOrder")
 	public ResponseEntity<?> addOrder(@Validated @RequestParam("cartItemIdList") List<Integer> cartItemIdList,
-			@Validated @RequestParam("userId") Integer userId,
-			@Validated @RequestParam("deliveryId") Integer deliveryId,
-			@Validated @RequestParam("address") String address, @Validated @RequestParam("phone") String phone) {
-		Optional<User> optUser = userRepository.findById(userId);
-		Optional<Delivery> optDelivery = deliveryRepository.findById(deliveryId);
-		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
-		List<CartItem> cartItemList = new ArrayList<>();
-		List<OrderItem> orderItemList = new ArrayList<>();
-		Integer maxStoreId = -1;
-		Integer tempStoreId;
-		for (Integer cartItemId : cartItemIdList) {
-			Optional<CartItem> optCartItem = cartItemRepository.findById(cartItemId);
-			tempStoreId = optCartItem.get().getProduct().getStore().getId();
-			if (tempStoreId > maxStoreId) {
-				maxStoreId = tempStoreId;
-			}
-			cartItemList.add(optCartItem.get());
-			
-			OrderItem orderItem = new OrderItem();
-			orderItem.setCartItem(optCartItem.get());
-			orderItem.setCreateAt(timestamp);
-			
-			orderItemList.add(orderItem);
-			
-			optCartItem.get().setIsPayed(true);
-			cartItemRepository.save(optCartItem.get());
-		}
+	                                   @Validated @RequestParam("userId") Integer userId,
+	                                   @Validated @RequestParam("deliveryId") Integer deliveryId,
+	                                   @Validated @RequestParam("address") String address,
+	                                   @Validated @RequestParam("phone") String phone) {
+	    Optional<User> optUser = userRepository.findById(userId);
+	    Optional<Delivery> optDelivery = deliveryRepository.findById(deliveryId);
+	    Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+	    List<CartItem> cartItemList = new ArrayList<>();
+	    List<Order> orderList = new ArrayList<>();
 
-		Order[] orderList = new Order[maxStoreId + 1];
-		boolean[] flag = new boolean[maxStoreId + 1];
-		Arrays.fill(flag, false);
+	    // Lấy danh sách các CartItem từ danh sách ID được cung cấp
+	    for (Integer cartItemId : cartItemIdList) {
+	        Optional<CartItem> optCartItem = cartItemRepository.findById(cartItemId);
+	        cartItemList.add(optCartItem.get());
+	    }
 
-		for (CartItem cartItem : cartItemList) {
-			Integer storeId = cartItem.getProduct().getStore().getId();
-			if (flag[storeId] == false) {
-				orderList[storeId] = new Order();
-				orderList[storeId].setUser(optUser.get());
-				orderList[storeId].setDelivery(optDelivery.get());
-				orderList[storeId].setStore(storeRepository.findById(storeId).get());
-				orderList[storeId].setAddress(address.trim());
-				orderList[storeId].setPhone(phone.trim());
-				orderList[storeId].setPrice(priceEstimate(cartItemList, storeId));
-				orderList[storeId].setCreateAt(timestamp);
+	    // Tạo danh sách các đơn hàng dựa trên Store và lưu vào cơ sở dữ liệu
+	    Map<Integer, Order> orderMap = new HashMap<>();
+	    for (CartItem cartItem : cartItemList) {
+	        Integer storeId = cartItem.getProduct().getStore().getId();
+	        if (!orderMap.containsKey(storeId)) {
+	            Order order = new Order();
+	            order.setUser(optUser.get());
+	            order.setDelivery(optDelivery.get());
+	            order.setStore(storeRepository.findById(storeId).get());
+	            order.setAddress(address.trim());
+	            order.setPhone(phone.trim());
+	            order.setPrice(priceEstimate(cartItemList, storeId));
+	            order.setStatus(0);
+	            order.setCreateAt(timestamp);
+	            orderMap.put(storeId, order);
+	        }
+	    }
+	    for (Order order : orderMap.values()) {
+	        orderList.add(orderRepository.save(order));
+	    }
 
-				flag[storeId] = true;
-				// luu lai cac orderItem (list)-> so sanh voi order.getorderItem -> luu
-			} 
-		}
-		for (int i = 0; i < orderList.length; i++) {
-			if (orderList[i] != null) {
-				orderRepository.save(orderList[i]);
-			}
-		}
-		
-		List<Order> orders = orderRepository.findAll();
-		for (Order o : orders) {
-			for (OrderItem oI : orderItemList) {
-				if (o.getCreateAt().equals(o.getCreateAt())){
-					oI.setOrder(o);
-					oI.setUnitPrice(oI.getCartItem().getQuantity() * oI.getCartItem().getProduct().getPromotionalPrice());
-					orderItemRepository.save(oI);
-				}
-			}		
-		}
+	    // Tạo danh sách các OrderItem và lưu vào cơ sở dữ liệu
+	    for (CartItem cartItem : cartItemList) {
+	        OrderItem orderItem = new OrderItem();
+	        orderItem.setCartItem(cartItem);
+	        orderItem.setCreateAt(timestamp);
+	        orderItem.setUnitPrice(cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice());
+	        Order order = orderMap.get(cartItem.getProduct().getStore().getId());
+	        orderItem.setOrder(order);
+	        orderItemRepository.save(orderItem);
+	    }
 
-		return ResponseEntity.ok().body("Suscess");
+	    // Cập nhật trạng thái của các CartItem
+	    for (CartItem cartItem : cartItemList) {
+	        cartItem.setIsPayed(true);
+	        cartItemRepository.save(cartItem);
+	    }
+
+	    return ResponseEntity.ok().body(orderRepository.findByCreateAt(timestamp));
 	}
+
+
 	public Integer priceEstimate(List<CartItem> cartItemList, Integer storeId) {
 		Integer sum = 0;
-		for (CartItem cartItem: cartItemList) {
+		for (CartItem cartItem : cartItemList) {
 			if (cartItem.getProduct().getStore().getId() == storeId) {
 				sum += cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice();
 			}

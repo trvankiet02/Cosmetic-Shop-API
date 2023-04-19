@@ -16,6 +16,7 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -50,6 +51,7 @@ public class Delivery {
 	private Date updateAt;
 	
 	//mapping to Order
+	@JsonBackReference
 	@OneToMany(mappedBy = "delivery")
 	private List<Order> orders;
 }

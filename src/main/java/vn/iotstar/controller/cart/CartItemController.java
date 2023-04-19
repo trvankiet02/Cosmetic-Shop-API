@@ -69,9 +69,9 @@ public class CartItemController {
 	
 	@PostMapping(path = "/addCartItem")
 	public ResponseEntity<?> addCartItem(@Validated @RequestParam("userId") Integer userId,
-			@Validated @RequestParam("productId") Integer productId,
-			@Validated @RequestParam("size") String size,
-			@Validated @RequestParam("quantity") Integer quantity){
+										@Validated @RequestParam("productId") Integer productId,
+										@Validated @RequestParam("size") String size,
+										@Validated @RequestParam("quantity") Integer quantity){
 		Optional<User> optUser = userRepository.findById(userId);
 		Optional<Product> optProduct = productRepository.findById(productId);
 		Optional<Store> optStore = storeRepository.findByProducts(optProduct.get());
@@ -80,6 +80,7 @@ public class CartItemController {
 		CartItem cartItem = new CartItem();
 		Boolean flag = false;
 		
+		//neu cart null thi them cart
 		if (optCart.isEmpty()) {
 			optCart = optCart.ofNullable(new Cart());			
 			
@@ -89,10 +90,11 @@ public class CartItemController {
 			
 
 			cartRepository.save(optCart.get());
-		} 	
+		}
 		optCart = cartRepository.findByUserAndStore(optUser.get(), optStore.get());
 		optCart.get().setUpdateAt(timestamp);
 		
+		//them cartitem vao cart
 		List<CartItem> cartItemList = optCart.get().getCartItems();
 		
 		if (cartItemList != null) {
