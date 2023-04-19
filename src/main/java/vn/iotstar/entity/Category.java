@@ -39,6 +39,8 @@ public class Category {
 	
 	private String categoryImage;
 	
+	private Boolean isSelling;
+	
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
 	private Date createAt;

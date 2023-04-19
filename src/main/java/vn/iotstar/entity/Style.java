@@ -40,6 +40,8 @@ public class Style {
 	
 	private String styleImage;
 	
+	private Boolean isSelling;
+	
 	//private int categoryId;
 	@ManyToOne
 	@JoinColumn(name = "categoryId")
