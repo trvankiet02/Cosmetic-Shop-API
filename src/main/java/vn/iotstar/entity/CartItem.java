@@ -47,6 +47,8 @@ public class CartItem {
 	private String size;
 	
 	private Integer quantity;
+	
+	private Boolean isPayed;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")

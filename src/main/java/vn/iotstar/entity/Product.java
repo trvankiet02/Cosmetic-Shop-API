@@ -77,6 +77,8 @@ public class Product {
 	@JoinColumn(name = "storeId")
 	private Store store;
 	
+	private Boolean isSelling;
+	
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
 	private Date createAt;

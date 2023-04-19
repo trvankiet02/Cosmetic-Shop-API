@@ -40,6 +40,8 @@ public class OrderItem {
 	@OneToOne
 	@JoinColumn(name = "cartItemId")
 	private CartItem cartItem;
+	
+	private Integer unitPrice;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")

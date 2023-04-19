@@ -53,6 +53,8 @@ public class Order {
 	@Column(columnDefinition = "nvarchar(255)")
 	private String address;
 	
+	private Integer price;
+	
 	private String phone;
 	
 	private Integer status;

@@ -1,9 +1,13 @@
 package vn.iotstar.controller.order_delivery;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,39 +33,42 @@ import vn.iotstar.repository.UserRepository;
 @RestController
 @RequestMapping(path = "/api/order")
 public class OrderController {
-	
+
 	@Autowired
 	private OrderRepository orderRepository;
-	
+
 	@Autowired
 	private OrderItemRepository orderItemRepository;
-	
+
 	@Autowired
 	private CartItemRepository cartItemRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
-	@Autowired 
-	private DeliveryRepository deliveryRepository;	
-	
+
+	@Autowired
+	private DeliveryRepository deliveryRepository;
+
 	@Autowired
 	private StoreRepository storeRepository;
-	
+
+	private EntityManager entityManager;
+
 	@GetMapping
-	public ResponseEntity<?> getAllOrder(){
+	public ResponseEntity<?> getAllOrder() {
 		return ResponseEntity.ok().body(orderRepository.findAll());
 	}
-	
+
 	@PostMapping(path = "/addOrder")
 	public ResponseEntity<?> addOrder(@Validated @RequestParam("cartItemIdList") List<Integer> cartItemIdList,
 			@Validated @RequestParam("userId") Integer userId,
 			@Validated @RequestParam("deliveryId") Integer deliveryId,
-			@Validated @RequestParam("address") String address,
-			@Validated @RequestParam("phone") String phone){
+			@Validated @RequestParam("address") String address, @Validated @RequestParam("phone") String phone) {
 		Optional<User> optUser = userRepository.findById(userId);
 		Optional<Delivery> optDelivery = deliveryRepository.findById(deliveryId);
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		List<CartItem> cartItemList = new ArrayList<>();
+		List<OrderItem> orderItemList = new ArrayList<>();
 		Integer maxStoreId = -1;
 		Integer tempStoreId;
 		for (Integer cartItemId : cartItemIdList) {
@@ -71,17 +78,23 @@ public class OrderController {
 				maxStoreId = tempStoreId;
 			}
 			cartItemList.add(optCartItem.get());
+			
+			OrderItem orderItem = new OrderItem();
+			orderItem.setCartItem(optCartItem.get());
+			orderItem.setCreateAt(timestamp);
+			
+			orderItemList.add(orderItem);
+			
+			optCartItem.get().setIsPayed(true);
+			cartItemRepository.save(optCartItem.get());
 		}
-		
+
 		Order[] orderList = new Order[maxStoreId + 1];
 		boolean[] flag = new boolean[maxStoreId + 1];
 		Arrays.fill(flag, false);
-		
-		List<OrderItem> orderItemNotSave = new ArrayList<>();
-		
+
 		for (CartItem cartItem : cartItemList) {
 			Integer storeId = cartItem.getProduct().getStore().getId();
-			OrderItem orderItem = new OrderItem();
 			if (flag[storeId] == false) {
 				orderList[storeId] = new Order();
 				orderList[storeId].setUser(optUser.get());
@@ -89,32 +102,40 @@ public class OrderController {
 				orderList[storeId].setStore(storeRepository.findById(storeId).get());
 				orderList[storeId].setAddress(address.trim());
 				orderList[storeId].setPhone(phone.trim());
+				orderList[storeId].setPrice(priceEstimate(cartItemList, storeId));
+				orderList[storeId].setCreateAt(timestamp);
+
 				flag[storeId] = true;
-			} else {
-				orderItem.setOrder(orderList[storeId]);
-				orderItem.setCartItem(cartItem);
-				
-				orderItemNotSave.add(orderItem);
-				/*
-				 * List<OrderItem> orderItemOfOrder = orderList[storeId].getOrderItems(); if
-				 * (orderItemOfOrder == null) { orderItemOfOrder = new ArrayList<>(); }
-				 * orderItemOfOrder.add(orderItem);
-				 * orderList[storeId].setOrderItems(orderItemOfOrder);
-				 */
-				
-				
-			}
-			for (int i = 0; i < orderList.length; i++) {
-				if (orderList[i] != null) {
-					orderRepository.save(orderList[i]);
-				}
-			}
-			for (OrderItem oI : orderItemNotSave) {
-				orderItemRepository.save(oI);
+				// luu lai cac orderItem (list)-> so sanh voi order.getorderItem -> luu
+			} 
+		}
+		for (int i = 0; i < orderList.length; i++) {
+			if (orderList[i] != null) {
+				orderRepository.save(orderList[i]);
 			}
 		}
 		
-		return ResponseEntity.ok().body(orderRepository.findByUser(optUser.get()));
+		List<Order> orders = orderRepository.findAll();
+		for (Order o : orders) {
+			for (OrderItem oI : orderItemList) {
+				if (o.getCreateAt().equals(o.getCreateAt())){
+					oI.setOrder(o);
+					oI.setUnitPrice(oI.getCartItem().getQuantity() * oI.getCartItem().getProduct().getPromotionalPrice());
+					orderItemRepository.save(oI);
+				}
+			}		
+		}
+
+		return ResponseEntity.ok().body("Suscess");
+	}
+	public Integer priceEstimate(List<CartItem> cartItemList, Integer storeId) {
+		Integer sum = 0;
+		for (CartItem cartItem: cartItemList) {
+			if (cartItem.getProduct().getStore().getId() == storeId) {
+				sum += cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice();
+			}
+		}
+		return sum;
 	}
 
 }

@@ -1,6 +1,7 @@
 package vn.iotstar.controller.cart;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -94,7 +95,7 @@ public class CartItemController {
 		
 		List<CartItem> cartItemList = optCart.get().getCartItems();
 		
-		if (cartItemList.size() != 0) {
+		if (cartItemList != null) {
 			for (CartItem cI : cartItemList) {
 				if (cI.getProduct().getId() == productId && cI.getSize().trim().equals(size.trim())) {
 					cI.setQuantity(cI.getQuantity() + quantity);
@@ -103,13 +104,15 @@ public class CartItemController {
 					break;
 				}
 			}
-		} 
+		} else {
+			cartItemList = new ArrayList<>();
+		}
 		if (flag == false) {
 			cartItem.setCreateAt(timestamp);
 			cartItem.setProduct(optProduct.get());
 			cartItem.setCart(optCart.get());
 			cartItem.setQuantity(quantity);
-			cartItem.setSize(size);
+			cartItem.setSize(size.trim());
 			
 			cartItemRepository.save(cartItem);
 		}
