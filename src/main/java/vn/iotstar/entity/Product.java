@@ -108,8 +108,11 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	private List<CartItem> cartItems;
 	
-	//mapping to Product
-	@JsonIgnore
-	@OneToMany(mappedBy = "product")
-	private List<Review> reviews;
+	/*
+	 * //mapping to Product
+	 * 
+	 * @JsonIgnore
+	 * 
+	 * @OneToMany(mappedBy = "product") private List<Review> reviews;
+	 */
 }
