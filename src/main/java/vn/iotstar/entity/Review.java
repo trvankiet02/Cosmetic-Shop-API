@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -36,40 +37,39 @@ public class Review {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	//private int userId;
+
+	// private int userId;
 	@ManyToOne
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
+	// private int productId;
 	/*
-	 * //private int productId;
+	 * @ManyToMany
 	 * 
-	 * @ManyToOne
-	 * 
-	 * @JoinColumn(name = "productId") private Product product;
+	 * @JoinColumn(name = "productId") private List<Product> products;
 	 */
-	
-	//private int orderId;
+
+	// private int orderId;
 	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "orderId")
 	private Order order;
-	
+
 	@Column(columnDefinition = "nvarchar(255)")
 	private String content;
-	
+
 	private float rating;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
 	private Date createAt;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
 	private Date updateAt;
-	
-	//mapping to ReviewImage
+
+	// mapping to ReviewImage
 	@JsonManagedReference
 	@OneToMany(mappedBy = "review")
 	List<ReviewImage> reviewImages;

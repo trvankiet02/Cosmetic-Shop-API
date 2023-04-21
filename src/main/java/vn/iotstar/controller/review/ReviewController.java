@@ -1,6 +1,7 @@
 package vn.iotstar.controller.review;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,11 +20,17 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import vn.iotstar.entity.CartItem;
 import vn.iotstar.entity.Order;
+import vn.iotstar.entity.OrderItem;
+import vn.iotstar.entity.Product;
 import vn.iotstar.entity.Review;
 import vn.iotstar.entity.ReviewImage;
 import vn.iotstar.entity.User;
+import vn.iotstar.repository.CartItemRepository;
+import vn.iotstar.repository.OrderItemRepository;
 import vn.iotstar.repository.OrderRepository;
+import vn.iotstar.repository.ProductRepository;
 import vn.iotstar.repository.ReviewImageRepository;
 import vn.iotstar.repository.ReviewRepository;
 import vn.iotstar.repository.UserRepository;
@@ -35,16 +43,47 @@ public class ReviewController {
 	private ReviewRepository reviewRepository;
 
 	@Autowired
-	private UserRepository userRepository;
+	private CartItemRepository cartItemRepository;
+	
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	@Autowired
 	private OrderRepository orderRepository;
 
 	@Autowired
+	private ProductRepository productRepository;
+	
+	@Autowired
 	private ReviewImageRepository reviewImageRepository;
 
 	@Autowired
 	private Cloudinary cloudinary;
+	
+	@PostMapping(path = "/getReview")
+	public ResponseEntity<?> getReview (@Validated @RequestParam("productId") Integer productId){
+		// order -> orderItem -> cartItem -> product
+		Product product = productRepository.findById(productId).get();
+		List<Order> orders = new ArrayList<>();
+		for (CartItem cartItem : product.getCartItems()) {
+			OrderItem orderItem = cartItem.getOrderItem();
+			if (orderItem != null) {
+	            Order order = orderItem.getOrder();
+	            if (order != null) {
+	            	orders.add(order);
+	            }
+	        }
+		}
+		
+		List<Review> reviews = new ArrayList<>();
+		for (Order order : orders) {
+		    reviews.add(order.getReview());
+		}
+
+
+		
+		return ResponseEntity.ok().body(reviews);
+	}
 
 	@PostMapping(path = "/addReview")
 	public ResponseEntity<?> addReview(@Validated @RequestParam("orderId") Integer orderId,
@@ -53,8 +92,11 @@ public class ReviewController {
 			@RequestParam("reviewImages") List<MultipartFile> reviewImages) {
 		Optional<Order> optOrder = orderRepository.findById(orderId);
 		User user = optOrder.get().getUser();
+		
+		//luu danh sach san pham duoc review 
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 
+		
 		Review review = new Review();
 
 		review.setOrder(optOrder.get());

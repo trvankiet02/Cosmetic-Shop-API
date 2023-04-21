@@ -24,6 +24,7 @@ import vn.iotstar.entity.CartItem;
 import vn.iotstar.entity.Delivery;
 import vn.iotstar.entity.Order;
 import vn.iotstar.entity.OrderItem;
+import vn.iotstar.entity.Product;
 import vn.iotstar.entity.User;
 import vn.iotstar.repository.CartItemRepository;
 import vn.iotstar.repository.DeliveryRepository;
@@ -101,6 +102,7 @@ public class OrderController {
 	            order.setCreateAt(timestamp);
 	            orderMap.put(storeId, order);
 	        }
+	        
 	    }
 	    for (Order order : orderMap.values()) {
 	        orderList.add(orderRepository.save(order));

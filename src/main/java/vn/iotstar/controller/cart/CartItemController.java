@@ -115,6 +115,7 @@ public class CartItemController {
 			cartItem.setCart(optCart.get());
 			cartItem.setQuantity(quantity);
 			cartItem.setSize(size.trim());
+			cartItem.setIsPayed(false);
 			
 			cartItemRepository.save(cartItem);
 		}
