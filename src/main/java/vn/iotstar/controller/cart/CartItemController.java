@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.Cart;
 import vn.iotstar.entity.CartItem;
 import vn.iotstar.entity.Product;
@@ -50,6 +51,7 @@ public class CartItemController {
 	@Autowired
 	private StoreRepository storeRepository;
 	
+	//chưa sài
 	@PostMapping(path = "/getCartItem")
 	public ResponseEntity<?> getCartItem(){
 		return ResponseEntity.ok().body(cartItemRepository.findAll());
@@ -61,10 +63,12 @@ public class CartItemController {
 		
 		if (optCartItem.isPresent()) {
 			cartItemRepository.delete(optCartItem.get());
-			return ResponseEntity.ok().body("Xoá sản phẩm trong giỏ hàng thành công");
+			//return ResponseEntity.ok().body("Xoá sản phẩm trong giỏ hàng thành công");
+			return new ResponseEntity<Response>(new Response(true, "Xoá sản phẩm trong giỏ hàng thành công", null), HttpStatus.OK);
 		}
 		
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quá trình xử lý gặp lỗi");
+		//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quá trình xử lý gặp lỗi");
+		return new ResponseEntity<Response>(new Response(false, "Quá trình xử lý gặp lỗi", null), HttpStatus.BAD_REQUEST);
 	}
 	
 	@PostMapping(path = "/addCartItem")
@@ -115,13 +119,13 @@ public class CartItemController {
 			cartItem.setCart(optCart.get());
 			cartItem.setQuantity(quantity);
 			cartItem.setSize(size.trim());
-			cartItem.setIsPayed(false);
 			
 			cartItemRepository.save(cartItem);
 		}
 		
 		cartRepository.save(optCart.get());
 		
-		return ResponseEntity.ok().body(cartItem);
+		//return ResponseEntity.ok().body(cartItem);
+		return new ResponseEntity<Response>(new Response(true, "Thành công", cartItem), HttpStatus.OK);
 	}
 }

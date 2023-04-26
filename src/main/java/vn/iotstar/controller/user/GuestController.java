@@ -20,8 +20,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.User;
 import vn.iotstar.repository.UserRepository;
 import vn.iotstar.util.CodeDetail;
@@ -37,7 +39,8 @@ public class GuestController {
 	private UserRepository userRepository;
 
 	@PostMapping(path = "/login")
-	public ResponseEntity<?> login(@Validated @RequestParam("email") String email,
+	@ResponseBody
+	public ResponseEntity<Response> login(@Validated @RequestParam("email") String email,
 			@Validated @RequestParam("password") String password) {
 		Optional<User> user = userRepository.findByEmail(email);
 		String message = "";
@@ -47,15 +50,19 @@ public class GuestController {
 				Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 
 				user.get().setLastLogin(timestamp);
-
-				return ResponseEntity.ok().body(user.get());
+				userRepository.save(user.get());
+				message = "Đăng nhập thành công";
+				//return ResponseEntity.ok().body(user.get());
+				return new ResponseEntity<Response>(new Response(true, message, user.get()), HttpStatus.OK);
 			} else {
 				message = "Mật khẩu bạn đã nhập không chĩnh xác";
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+				//return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+				return new ResponseEntity<Response>(new Response(false, message, null), HttpStatus.UNAUTHORIZED);
 			}
 		} else {
 			message = "Địa chỉ email bạn đã nhập không tồn tại";
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+			return new ResponseEntity<Response>(new Response(false, message, null), HttpStatus.UNAUTHORIZED);
 		}
 
 	}
@@ -64,28 +71,32 @@ public class GuestController {
 	public ResponseEntity<?> signup(@Validated @RequestParam("email") String email,
 			@Validated @RequestParam("password") String password,
 			@Validated @RequestParam("rePassword") String rePassword) {
-		Optional<User> user = userRepository.findByEmail(email);
+		Optional<User> optUser = userRepository.findByEmail(email);
 		String message = "";
 
-		if (user.isPresent()) {
+		if (optUser.isPresent()) {
 			message = "Tài khoản email đã tồn tại trong hệ thống";
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+			//return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+			return new ResponseEntity<Response>(new Response(false, message, null), HttpStatus.CONFLICT);
 		} else {
 			if (password.equals(rePassword)) {
 				Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+				User user = new User();
+				user.setEmail(email);
+				user.setPassword(password);
+				user.setRole(false);
+				user.setEWallet(0);
+				user.setCreateAt(timestamp);
 
-				user.get().setEmail(email);
-				user.get().setPassword(password);
-				user.get().setRole(false);
-				user.get().setEWallet(0);
-				user.get().setCreateAt(timestamp);
+				userRepository.save(user);
 
-				userRepository.save(user.get());
-
-				return ResponseEntity.ok().body(user.get());
+				//return ResponseEntity.ok().body(user);
+				message = "Đăng ký thành công";
+				return new ResponseEntity<Response>(new Response(true, message, user), HttpStatus.OK);
 			} else {
 				message = "Mật khẩu và xác nhận mật khẩu không khớp";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+				//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+				return new ResponseEntity<Response>(new Response(false, message, null), HttpStatus.BAD_REQUEST);
 			}
 		}
 	}

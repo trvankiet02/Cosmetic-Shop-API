@@ -18,6 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,7 +52,7 @@ public class Delivery {
 	private Date updateAt;
 	
 	//mapping to Order
-	@JsonBackReference
+	@JsonIgnore
 	@OneToMany(mappedBy = "delivery")
 	private List<Order> orders;
 }

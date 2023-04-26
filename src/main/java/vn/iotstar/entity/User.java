@@ -21,6 +21,7 @@ import javax.persistence.TemporalType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -68,10 +69,12 @@ public class User {
 	private Date lastLogin;
 	
 	//mapping to address
+	@JsonManagedReference
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
 	private List<Address> addresses;
 	
 	//mapping to store
+	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
 	private Store store;
 	

@@ -10,5 +10,5 @@ import vn.iotstar.entity.OrderItem;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer>{
-	Optional<OrderItem> findByCartItem(CartItem cartItem);
+	//Optional<OrderItem> findByCartItem(CartItem cartItem);
 }

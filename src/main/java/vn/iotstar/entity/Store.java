@@ -19,7 +19,9 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,6 +49,7 @@ public class Store {
 	private String email;
 	
 	//private int userId;
+	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "userId")
 	private User user;
@@ -68,6 +71,7 @@ public class Store {
 	private Date updateAt;
 	
 	//mapping to UserFolowSore
+	@JsonManagedReference
 	@OneToMany(mappedBy = "store")
 	private List<UserFollowStore> userFollowStores;
 	
@@ -81,6 +85,7 @@ public class Store {
 	private List<Cart> carts;
 	
 	//mapping to order
+	@JsonIgnore
 	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
 }

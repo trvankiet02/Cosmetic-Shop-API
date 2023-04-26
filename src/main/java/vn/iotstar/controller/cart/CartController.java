@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.User;
 import vn.iotstar.repository.CartRepository;
 import vn.iotstar.repository.UserRepository;
@@ -29,9 +30,11 @@ public class CartController {
 	public ResponseEntity<?> getCart(@Validated @RequestParam("userId") Integer userId){
 		Optional<User> user = userRepository.findById(userId);
 		if (user.isPresent()) {
-			return ResponseEntity.ok().body(user.get().getCarts());
+			//return ResponseEntity.ok().body(user.get().getCarts());
+			return new ResponseEntity<Response>(new Response(true, "Thành công", user.get().getCarts()), HttpStatus.OK);
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Mã khách hàng không tồn tại");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Mã khách hàng không tồn tại");
+			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
 		}
 	}
 	

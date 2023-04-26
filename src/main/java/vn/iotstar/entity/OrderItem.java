@@ -42,10 +42,14 @@ public class OrderItem {
 	private Order order;
 	
 	//private int cartItemId;
-	@OneToOne
-	@JsonIgnore
-	@JoinColumn(name = "cartItemId")
-	private CartItem cartItem;
+	@ManyToOne
+	@JsonBackReference
+	@JoinColumn(name = "productId")
+	private Product product;
+	
+	private String size;
+	
+	private Integer quantity;
 	
 	private Integer unitPrice;
 

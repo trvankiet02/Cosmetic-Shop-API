@@ -21,6 +21,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.ProductImage;
@@ -63,41 +64,53 @@ public class ProductController {
 		Optional<Product> product = productRepository.findById(id);
 		
 		if (product.isPresent()) {
-			return ResponseEntity.ok().body(product.get());
+			//return ResponseEntity.ok().body(product.get());
+			return new ResponseEntity<Response>(new Response(true, "Thành công", product.get()), HttpStatus.OK);
 		} else {
-			return ResponseEntity.notFound().build();
+			//return ResponseEntity.notFound().build();
+			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.NOT_FOUND);
 		}
 	}
 	
 	@PostMapping(path = "/getProductByCategory")
 	public ResponseEntity<?> getProductByCategory(@Validated @RequestParam("categoryId") Integer categoryId){
 		Optional<Category> optCategory = categoryRepository.findById(categoryId);
-		
+		String message = "";
 		if (optCategory.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không tồn tại trong hệ thống");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không tồn tại trong hệ thống");
+			return new ResponseEntity<Response>(new Response(false, "Loại sản phẩm này không tồn tại trong hệ thống", null), HttpStatus.NOT_FOUND);
 		} else {
 			List<Product> productList = productRepository.findByCategory(optCategory.get());
 			if (productList.size() == 0) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+				//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+				//return new ResponseEntity<Response>(new Response(true, "Loại sản phẩm này không có sản phẩm", productList), HttpStatus.OK);
+				message = "Loại sản phẩm này không có sản phẩm";
 			} else {
-				return ResponseEntity.ok().body(productList);
+				//return ResponseEntity.ok().body(productList);
+				//return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
+				message = "Thành công";
 			}
+			return new ResponseEntity<Response>(new Response(true, message, productList), HttpStatus.OK);
 		}
 	}
 	
 	@PostMapping(path = "/getProductByStyle")
 	public ResponseEntity<?> getProductByStyle(@Validated @RequestParam("styleId") Integer styleId){
 		Optional<Style> optStyle = styleRepository.findById(styleId);
-		
+		String message = "";
 		if (optStyle.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại phong cách này không tồn tại trong hệ thống");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại phong cách này không tồn tại trong hệ thống");
+			return new ResponseEntity<Response>(new Response(false, "Loại phong cách này không tồn tại trong hệ thống", null), HttpStatus.NOT_FOUND);
 		} else {
 			List<Product> productList = productRepository.findByStyle(optStyle.get());
 			if (productList.size() == 0) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+				//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+				message = "Loại sản phẩm này không có sản phẩm";
 			} else {
-				return ResponseEntity.ok().body(productList);
+				//return ResponseEntity.ok().body(productList);
+				message = "Thành công";
 			}
+			return new ResponseEntity<Response>(new Response(true, message, productList), HttpStatus.OK);
 		}
 	}
 	
@@ -116,7 +129,8 @@ public class ProductController {
 		Optional<Product> optProduct = productRepository.findByName(productName);
 		
 		if (optProduct.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sản phẩm này đã tồn tại trong hệ thống");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sản phẩm này đã tồn tại trong hệ thống");
+			return new ResponseEntity<Response>(new Response(false, "Sản phẩm này đã tồn tại trong hệ thống", optProduct.get()), HttpStatus.BAD_REQUEST);
 		} else {
 			Product product = new Product();
 			Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
@@ -156,7 +170,8 @@ public class ProductController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return ResponseEntity.ok().body(product);
+			//return ResponseEntity.ok().body(product);
+			return new ResponseEntity<Response>(new Response(true, "Thành công", product), HttpStatus.OK);
 		}
 	}
 }

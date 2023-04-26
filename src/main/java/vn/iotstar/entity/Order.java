@@ -19,6 +19,7 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -38,19 +39,18 @@ public class Order {
 	private Integer id;
 	
 	//private int userId;
+	@JsonBackReference
 	@ManyToOne
-	@JsonIgnore
 	@JoinColumn(name = "userId")
 	private User user;
 	
 	//private int deliveryId;
-	@JsonManagedReference
 	@ManyToOne
 	@JoinColumn(name = "deliveryId")
 	private Delivery delivery;
 	
+	//private int storeId;
 	@ManyToOne
-	@JsonIgnore
 	@JoinColumn(name = "storeId")
 	private Store store;
 	

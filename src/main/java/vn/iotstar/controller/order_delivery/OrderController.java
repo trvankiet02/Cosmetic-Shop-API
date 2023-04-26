@@ -12,6 +12,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.CartItem;
 import vn.iotstar.entity.Delivery;
 import vn.iotstar.entity.Order;
@@ -65,7 +67,8 @@ public class OrderController {
 			@Validated @RequestParam("status") Integer status) {
 		Optional<User> optUser = userRepository.findById(userId);
 
-		return ResponseEntity.ok().body(orderRepository.findByUserAndStatus(optUser.get(), status));
+		//return ResponseEntity.ok().body(orderRepository.findByUserAndStatus(optUser.get(), status));
+		return new ResponseEntity<Response>(new Response(true, "Thành công", orderRepository.findByUserAndStatus(optUser.get(), status)), HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/addOrder")
@@ -111,7 +114,9 @@ public class OrderController {
 	    // Tạo danh sách các OrderItem và lưu vào cơ sở dữ liệu
 	    for (CartItem cartItem : cartItemList) {
 	        OrderItem orderItem = new OrderItem();
-	        orderItem.setCartItem(cartItem);
+	        orderItem.setProduct(cartItem.getProduct());
+	        orderItem.setSize(cartItem.getSize());
+	        orderItem.setQuantity(cartItem.getQuantity());
 	        orderItem.setCreateAt(timestamp);
 	        orderItem.setUnitPrice(cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice());
 	        Order order = orderMap.get(cartItem.getProduct().getStore().getId());
@@ -121,11 +126,10 @@ public class OrderController {
 
 	    // Cập nhật trạng thái của các CartItem
 	    for (CartItem cartItem : cartItemList) {
-	        cartItem.setIsPayed(true);
-	        cartItemRepository.save(cartItem);
+	        cartItemRepository.delete(cartItem);
 	    }
-
-	    return ResponseEntity.ok().body(orderRepository.findByCreateAt(timestamp));
+	    //return ResponseEntity.ok().body(orderRepository.findByCreateAt(timestamp));
+	    return new ResponseEntity<Response>(new Response(true, "Thành công", orderRepository.findByCreateAt(timestamp)), HttpStatus.OK);
 	}
 
 

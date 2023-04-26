@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.CartItem;
 import vn.iotstar.entity.Order;
 import vn.iotstar.entity.OrderItem;
@@ -44,7 +46,7 @@ public class ReviewController {
 
 	@Autowired
 	private CartItemRepository cartItemRepository;
-	
+
 	@Autowired
 	private OrderItemRepository orderItemRepository;
 
@@ -53,36 +55,33 @@ public class ReviewController {
 
 	@Autowired
 	private ProductRepository productRepository;
-	
+
 	@Autowired
 	private ReviewImageRepository reviewImageRepository;
 
 	@Autowired
 	private Cloudinary cloudinary;
-	
+
 	@PostMapping(path = "/getReview")
-	public ResponseEntity<?> getReview (@Validated @RequestParam("productId") Integer productId){
+	public ResponseEntity<?> getReview(@Validated @RequestParam("productId") Integer productId) {
 		// order -> orderItem -> cartItem -> product
 		Product product = productRepository.findById(productId).get();
 		List<Order> orders = new ArrayList<>();
-		for (CartItem cartItem : product.getCartItems()) {
-			OrderItem orderItem = cartItem.getOrderItem();
+		for (OrderItem orderItem : product.getOrderItems()) {
 			if (orderItem != null) {
-	            Order order = orderItem.getOrder();
-	            if (order != null) {
-	            	orders.add(order);
-	            }
-	        }
+				Order order = orderItem.getOrder();
+				if (order != null) {
+					orders.add(order);
+				}
+			}
 		}
-		
+
 		List<Review> reviews = new ArrayList<>();
 		for (Order order : orders) {
-		    reviews.add(order.getReview());
+			reviews.add(order.getReview());
 		}
-
-
-		
-		return ResponseEntity.ok().body(reviews);
+		//return ResponseEntity.ok().body(reviews);
+		return new ResponseEntity<Response>(new Response(true, "Thành công", reviews), HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/addReview")
@@ -92,11 +91,10 @@ public class ReviewController {
 			@RequestParam("reviewImages") List<MultipartFile> reviewImages) {
 		Optional<Order> optOrder = orderRepository.findById(orderId);
 		User user = optOrder.get().getUser();
-		
-		//luu danh sach san pham duoc review 
+
+		// luu danh sach san pham duoc review
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 
-		
 		Review review = new Review();
 
 		review.setOrder(optOrder.get());
@@ -125,7 +123,7 @@ public class ReviewController {
 
 			reviewImageRepository.save(reviewImage);
 		}
-
-		return ResponseEntity.ok().body(reviewRepository.findByOrder(optOrder.get()));
+		//return ResponseEntity.ok().body(reviewRepository.findByOrder(optOrder.get()));
+		return new ResponseEntity<Response>(new Response(true, "Thành công", reviewRepository.findByOrder(optOrder.get())), HttpStatus.OK);
 	}
 }

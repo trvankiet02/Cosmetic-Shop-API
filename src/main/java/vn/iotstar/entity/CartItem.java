@@ -40,6 +40,7 @@ public class CartItem {
 	private Cart cart;
 	
 	//private int productId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "productId")
 	private Product product;
@@ -48,7 +49,6 @@ public class CartItem {
 	
 	private Integer quantity;
 	
-	private Boolean isPayed;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
@@ -58,8 +58,11 @@ public class CartItem {
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")
 	private Date updateAt;
 	
-	//mapping to cartItem
-	@JsonIgnore
-	@OneToOne(mappedBy = "cartItem")
-	private OrderItem orderItem;
+	/*
+	 * //mapping to cartItem
+	 * 
+	 * @JsonIgnore
+	 * 
+	 * @OneToOne(mappedBy = "cartItem") private OrderItem orderItem;
+	 */
 }

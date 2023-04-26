@@ -7,7 +7,7 @@ public class Response {
 	
 	private String message;
 	
-	private ResponseEntity<?> body;
+	private Object body;
 
 	public Boolean getStatus() {
 		return status;
@@ -25,15 +25,15 @@ public class Response {
 		this.message = message;
 	}
 
-	public ResponseEntity<?> getBody() {
+	public Object getBody() {
 		return body;
 	}
 
-	public void setBody(ResponseEntity<?> body) {
+	public void setBody(Object body) {
 		this.body = body;
 	}
 
-	public Response(Boolean status, String message, ResponseEntity<?> body) {
+	public Response(Boolean status, String message, Object body) {
 		super();
 		this.status = status;
 		this.message = message;

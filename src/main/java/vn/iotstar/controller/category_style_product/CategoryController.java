@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import vn.iotstar.Response;
 import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.Style;
@@ -48,13 +49,15 @@ public class CategoryController {
 	}
 
 	@PostMapping(path = "/getCategory")
-	public ResponseEntity<Category> getCategory(@Validated @RequestParam("id") Integer id) {
+	public ResponseEntity<?> getCategory(@Validated @RequestParam("id") Integer id) {
 		Optional<Category> category = categoryRepository.findById(id);
 
 		if (category.isPresent()) {
-			return ResponseEntity.ok().body(category.get());
+			//return ResponseEntity.ok().body(category.get());
+			return new ResponseEntity<Response>(new Response(true, "Thành công", category.get()), HttpStatus.OK);
 		} else {
-			return ResponseEntity.notFound().build();
+			//return ResponseEntity.notFound().build();
+			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.NOT_FOUND);
 		}
 	}
 	
@@ -63,13 +66,16 @@ public class CategoryController {
 		Optional<Style> optStyle = styleRepository.findById(styleId);
 		
 		if (optStyle.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại phong cách này không tồn tại trong hệ thống");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại phong cách này không tồn tại trong hệ thống");
+			return new ResponseEntity<Response>(new Response(false, "Loại phong cách này không tồn tại trong hệ thống", null), HttpStatus.NOT_FOUND);
 		} else {
 			List<Category> categoryList = categoryRepository.findByStyles(optStyle.get());
 			if (categoryList.size() == 0) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+				//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này không có sản phẩm");
+				return new ResponseEntity<Response>(new Response(false, "Loại sản phẩm này không có sản phẩm", null), HttpStatus.NOT_FOUND);
 			} else {
-				return ResponseEntity.ok().body(categoryList);
+				//return ResponseEntity.ok().body(categoryList);
+				return new ResponseEntity<Response>(new Response(true, "Thành công", categoryList), HttpStatus.OK);
 			}
 		}
 	}
@@ -80,7 +86,8 @@ public class CategoryController {
 		Optional<Category> optCategory = categoryRepository.findByName(categoryName);
 
 		if (optCategory.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này đã tồn tại trong hệ thống");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại sản phẩm này đã tồn tại trong hệ thống");
+			return new ResponseEntity<Response>(new Response(false, "Loại sản phẩm này đã tồn tại trong hệ thống", optCategory.get()), HttpStatus.BAD_REQUEST);
 		} else {
 			Category category = new Category();
 			Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
@@ -101,8 +108,8 @@ public class CategoryController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			return ResponseEntity.ok().body(category);
+			//return ResponseEntity.ok().body(category);
+			return new ResponseEntity<Response>(new Response(true, "Thành công", category), HttpStatus.OK);
 		}
 	}
 }

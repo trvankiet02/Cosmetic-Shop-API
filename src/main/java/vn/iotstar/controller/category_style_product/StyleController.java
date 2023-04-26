@@ -20,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import vn.iotstar.Response;
+import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Style;
 import vn.iotstar.repository.CategoryRepository;
 import vn.iotstar.repository.StyleRepository;
@@ -39,18 +41,38 @@ public class StyleController {
 	
 	@GetMapping
 	public ResponseEntity<?> getAllStyle(){
-		return ResponseEntity.ok().body(styleRepository.findAll());
+		//return ResponseEntity.ok().body(styleRepository.findAll());
+		return new ResponseEntity<Response>(new Response(true, "Thành công", styleRepository.findAll()), HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/getStyle")
-	public ResponseEntity<?> addStyle(@Validated @RequestParam("id") Integer id){
+	public ResponseEntity<?> getStyle(@Validated @RequestParam("id") Integer id){
 		Optional<Style> style = styleRepository.findById(id);
 		
 		if (style.isPresent()) {
-			return ResponseEntity.ok().body(style.get());
+			//return ResponseEntity.ok().body(style.get());
+			return new ResponseEntity<Response>(new Response(true, "Thành công", style.get()), HttpStatus.OK);
 		} else {
-			return ResponseEntity.notFound().build();
+			//return ResponseEntity.notFound().build();
+			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.NOT_FOUND);
 		}
+	}
+	
+	@PostMapping(path = "/getStyleByCategory")
+	public ResponseEntity<?> getStyleByCategory(@Validated @RequestParam("categoryId") Integer categoryId){
+		Optional<Category> optCategory = categoryRepository.findById(categoryId);
+		String message = "";
+		
+		if (optCategory.isEmpty()) {
+			return new ResponseEntity<Response>(new Response(true, "Thất bại", null), HttpStatus.NOT_FOUND);
+		} else {
+			if (optCategory.get().getStyles().isEmpty()) {
+				message = "Loại sản phẩm này không có phong cách sản phẩm";
+			} else {
+				message = "Thành công";
+			}
+		}
+		return new ResponseEntity<Response>(new Response(true, message, optCategory.get().getStyles()), HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/addStyle")
@@ -60,7 +82,8 @@ public class StyleController {
 		Optional<Style> optStyle = styleRepository.findByName(styleName);
 
 		if (optStyle.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phong cách sản phẩm này đã tồn tại trong hệ thống");
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phong cách sản phẩm này đã tồn tại trong hệ thống");
+			return new ResponseEntity<Response>(new Response(false, "Phong cách sản phẩm này đã tồn tại trong hệ thống", optStyle.get()), HttpStatus.BAD_REQUEST);
 		} else {
 			Style style = new Style();
 			Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
@@ -81,8 +104,8 @@ public class StyleController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			return ResponseEntity.ok().body(style);
+			//return ResponseEntity.ok().body(style);
+			return new ResponseEntity<Response>(new Response(true, "Thành công", style), HttpStatus.OK);
 		}
 	}
 	
