@@ -7,4 +7,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/api/store")
 public class StoreController {
 
+	
 }

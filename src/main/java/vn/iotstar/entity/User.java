@@ -39,7 +39,7 @@ public class User {
 	private Integer id;
 	
 	private String email;
-	
+	@JsonIgnore
 	private String password;
 	
 	@Column(columnDefinition = "nvarchar(50)")
@@ -52,7 +52,7 @@ public class User {
 	
 	private String profileImage;
 	
-	private Boolean role;
+	private Integer role; //0: user, 1: seller, 2: admin
 	
 	private Integer eWallet;
 	

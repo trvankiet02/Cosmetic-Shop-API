@@ -17,6 +17,7 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -43,6 +44,7 @@ public class Style {
 	private Boolean isSelling;
 	
 	//private int categoryId;
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "categoryId")
 	private Category category;
@@ -56,6 +58,7 @@ public class Style {
 	private Date updateAt;
 	
 	//mapping to product
+	@JsonIgnore
 	@OneToMany(mappedBy = "style")
 	private List<Product> product;
 }

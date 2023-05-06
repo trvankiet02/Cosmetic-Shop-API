@@ -45,7 +45,8 @@ public class CategoryController {
 
 	@GetMapping
 	public ResponseEntity<?> getAllCategory() {
-		return ResponseEntity.ok().body(categoryRepository.findAll());
+		//return ResponseEntity.ok().body(categoryRepository.findAll());
+		return new ResponseEntity<Response>(new Response(true, "Thành công", categoryRepository.findAll()), HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/getCategory")

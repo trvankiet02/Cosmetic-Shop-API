@@ -56,7 +56,7 @@ public class Category {
 	private List<Style> styles;
 	
 	//mapping to product
-	@JsonManagedReference
+	@JsonIgnore
 	@OneToMany(mappedBy = "category")
 	private List<Product> products;
 }

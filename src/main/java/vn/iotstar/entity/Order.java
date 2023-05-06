@@ -61,6 +61,7 @@ public class Order {
 	
 	private String phone;
 	
+	//0: da huy, 1: cho xac nhan, 2: da xac nhan, 3: dạng giao, 4: da nhan hang 
 	private Integer status;
 
 	@Temporal(TemporalType.TIMESTAMP)

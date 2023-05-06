@@ -84,7 +84,7 @@ public class GuestController {
 				User user = new User();
 				user.setEmail(email);
 				user.setPassword(password);
-				user.setRole(false);
+				user.setRole(0);
 				user.setEWallet(0);
 				user.setCreateAt(timestamp);
 
