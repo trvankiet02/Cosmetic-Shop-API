@@ -5,8 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -54,9 +59,22 @@ public class ProductController {
 	@Autowired
 	private Cloudinary cloudinary;
 	
+	@PostMapping(path = "/getRandomProduct")
+	ResponseEntity<?> getRandomProduct(@Validated @RequestParam("quantity") Integer quantity){
+		long totalCount = productRepository.count();
+		
+		int randomPage = new Random().nextInt((int) totalCount/quantity);
+		
+		Pageable pageable = PageRequest.of(randomPage, quantity);
+		
+		Page<Product> randomProductPage = productRepository.findAll(pageable);
+		
+		return new ResponseEntity<Response>(new Response(true, "Thành công", randomProductPage.getContent()), HttpStatus.OK);
+	}
+	
 	@GetMapping
-	public ResponseEntity<?> getAllStyle(){
-		return ResponseEntity.ok().body(productRepository.findAll());
+	public ResponseEntity<?> getAllProduct(){
+		return new ResponseEntity<Response>(new Response(true, "Thành công", productRepository.findAll()), HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/getProduct")
