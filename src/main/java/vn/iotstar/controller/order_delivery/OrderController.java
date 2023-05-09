@@ -59,7 +59,7 @@ public class OrderController {
 
 	@GetMapping
 	public ResponseEntity<?> getAllOrder() {
-		return ResponseEntity.ok().body(orderRepository.findAll());
+		return new ResponseEntity<Response>(new Response(true, "Thành công", orderRepository.findAll()), HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/getOrder")
