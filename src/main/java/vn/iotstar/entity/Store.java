@@ -71,11 +71,13 @@ public class Store {
 	private Date updateAt;
 	
 	//mapping to UserFolowSore
+	@JsonIgnore
 	@JsonManagedReference
 	@OneToMany(mappedBy = "store")
 	private List<UserFollowStore> userFollowStores;
 	
 	//mapping to Product
+	@JsonIgnore
 	@OneToMany(mappedBy = "store")
 	private List<Product> products;
 	
