@@ -37,6 +37,7 @@ public class UserFollowProductController {
 
 	@Autowired
 	private ProductRepository productRepository;
+	
 
 	@PostMapping(path = "/getFollowProduct")
 	public ResponseEntity<?> getUserFollowProduct(@Validated @RequestParam("userId") Integer userId) {
