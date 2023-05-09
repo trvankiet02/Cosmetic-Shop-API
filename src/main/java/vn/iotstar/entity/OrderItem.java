@@ -43,7 +43,6 @@ public class OrderItem {
 	
 	//private int cartItemId;
 	@ManyToOne
-	@JsonBackReference
 	@JoinColumn(name = "productId")
 	private Product product;
 	
