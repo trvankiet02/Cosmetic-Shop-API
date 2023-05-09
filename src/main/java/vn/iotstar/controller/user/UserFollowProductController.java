@@ -66,7 +66,7 @@ public class UserFollowProductController {
 
 		if (optUserFollowProduct.isPresent()) {
 			userFollowProductRepository.delete(optUserFollowProduct.get());
-			return new ResponseEntity<Response>(new Response(true, "Thành công", nullList), HttpStatus.OK);
+			return new ResponseEntity<Response>(new Response(true, "Unfollow thành công", nullList), HttpStatus.OK);
 		} else {
 			UserFollowProduct userFollowProduct = new UserFollowProduct();
 
@@ -77,7 +77,8 @@ public class UserFollowProductController {
 				userFollowProduct.setCreateAt(timestamp);
 				userFollowProduct.setProduct(optProduct.get());
 				userFollowProduct.setUser(optUser.get());
-				return new ResponseEntity<Response>(new Response(true, "Thành công", nullList), HttpStatus.OK);
+				userFollowProductRepository.save(userFollowProduct);
+				return new ResponseEntity<Response>(new Response(true, "Follow thành công", nullList), HttpStatus.OK);
 			}
 		}
 	}
