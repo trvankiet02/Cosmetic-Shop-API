@@ -1,6 +1,7 @@
 package vn.iotstar.controller.user;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -60,10 +61,12 @@ public class UserFollowProductController {
 
 		Optional<UserFollowProduct> optUserFollowProduct = userFollowProductRepository
 				.findByUserAndProduct(optUser.get(), optProduct.get());
+		
+		List<UserFollowProduct> nullList = new ArrayList<>();
 
 		if (optUserFollowProduct.isPresent()) {
 			userFollowProductRepository.delete(optUserFollowProduct.get());
-			return new ResponseEntity<Response>(new Response(true, "Thành công", null), HttpStatus.OK);
+			return new ResponseEntity<Response>(new Response(true, "Thành công", nullList), HttpStatus.OK);
 		} else {
 			UserFollowProduct userFollowProduct = new UserFollowProduct();
 
@@ -74,7 +77,7 @@ public class UserFollowProductController {
 				userFollowProduct.setCreateAt(timestamp);
 				userFollowProduct.setProduct(optProduct.get());
 				userFollowProduct.setUser(optUser.get());
-				return new ResponseEntity<Response>(new Response(true, "Thành công", null), HttpStatus.OK);
+				return new ResponseEntity<Response>(new Response(true, "Thành công", nullList), HttpStatus.OK);
 			}
 		}
 	}
