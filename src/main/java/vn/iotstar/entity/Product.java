@@ -72,7 +72,6 @@ public class Product {
 	private Category category;
 
 	// private int storeId;
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "storeId")
 	private Store store;
