@@ -3,6 +3,7 @@ package vn.iotstar.controller.category_style_product;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,6 +56,18 @@ public class StyleController {
 		} else {
 			//return ResponseEntity.notFound().build();
 			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@PostMapping(path = "/getStyleSelling")
+	public ResponseEntity<?> getStyleIsSelling(@Validated @RequestParam("styleId") Integer styleId){
+		Optional<Style> optStyle = styleRepository.findById(styleId);
+		if (optStyle.isPresent()) {
+			List<Style> styleList = styleRepository.findByCategoryAndIsSelling(optStyle.get().getCategory(), true);
+			return new ResponseEntity<Response>(new Response(true, "Thành công", styleList), HttpStatus.OK);
+			
+		} else {
+			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
