@@ -38,8 +38,18 @@ public class Address {
 	@JoinColumn(name = "userId")
 	private User user;
 	
+	@Column(columnDefinition = "nvarchar(50)")
+	private String firstName;
+
+	@Column(columnDefinition = "nvarchar(50)")
+	private String lastName;
+	
+	private String phone;
+	
 	@Column(columnDefinition = "nvarchar(255)")
 	private String address;
+	
+	private Boolean isDefault;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "YYYY-MM-DD hh:mi:ss")

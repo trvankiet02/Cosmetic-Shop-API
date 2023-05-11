@@ -74,6 +74,7 @@ public class OrderController {
 	@PostMapping(path = "/addOrder")
 	public ResponseEntity<?> addOrder(@Validated @RequestParam("cartItemIdList") List<Integer> cartItemIdList,
 	                                   @Validated @RequestParam("userId") Integer userId,
+	                                   @Validated @RequestParam("name") String name,
 	                                   @Validated @RequestParam("deliveryId") Integer deliveryId,
 	                                   @Validated @RequestParam("address") String address,
 	                                   @Validated @RequestParam("phone") String phone) {

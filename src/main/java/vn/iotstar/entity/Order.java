@@ -49,6 +49,8 @@ public class Order {
 	@JoinColumn(name = "deliveryId")
 	private Delivery delivery;
 	
+	private String name;
+	
 	//private int storeId;
 	@ManyToOne
 	@JoinColumn(name = "storeId")
