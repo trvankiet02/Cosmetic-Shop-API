@@ -117,7 +117,18 @@ public class CartItemController {
 		if (cartItemList != null) {
 			for (CartItem cI : cartItemList) {
 				if (cI.getProduct().getId() == productId && cI.getSize().trim().equals(size.trim())) {
-					cI.setQuantity(cI.getQuantity() + quantity);
+					int newQuantity = cI.getQuantity() + quantity;
+					
+					//Kiem tra so luong them
+					for (ProductQuantity pQ: cI.getProduct().getProductQuantities()) {
+						if (pQ.getSize().trim().equals(size.trim())) {
+							if (pQ.getQuantity() < newQuantity) {
+								return new ResponseEntity<Response>(new Response(false, "Thêm thất bại", null), HttpStatus.BAD_REQUEST);
+							}
+						}
+					}
+					
+					cI.setQuantity(newQuantity);
 					cartItem = cI;
 					flag = true;
 					break;
