@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,7 +62,7 @@ public class CartItemController {
 		return ResponseEntity.ok().body(cartItemRepository.findAll());
 	}
 	
-	@PostMapping(path = "/deleteCartItem")
+	@DeleteMapping(path = "/deleteCartItem")
 	public ResponseEntity<?> deleteCartItem(@Validated @RequestParam("cartItemId") Integer cartItemId){
 		Optional<CartItem> optCartItem = cartItemRepository.findById(cartItemId);
 		
