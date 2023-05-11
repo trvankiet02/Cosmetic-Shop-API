@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,5 +61,25 @@ public class AddressController {
 	    } else {
 	        return new ResponseEntity<Response>(new Response(false, "Không tìm thấy địa chỉ", null), HttpStatus.NOT_FOUND);
 	    }
+	}
+	
+	@GetMapping(path = "/user/{id}")
+	public ResponseEntity<?> getAddressByUserId(@PathVariable Integer id){
+		Optional<User> optUser = userRepository.findById(id);
+		if (optUser.isEmpty()) {
+			return new ResponseEntity<Response>(new Response(false, "Không tìm thấy người dùng", null), HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<Response>(new Response(true, "Thành công", addressRepository.findByUser(optUser.get())), HttpStatus.OK);
+		}
+	}
+	
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<?> deleteAddress(@PathVariable Integer id){
+		Optional<Address> optAddress = addressRepository.findById(id);
+		if (optAddress.isEmpty()) {
+			return new ResponseEntity<Response>(new Response(false, "Không tìm thấy địa chỉ", null), HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<Response>(new Response(true, "Xoá địa chỉ thành công", null), HttpStatus.OK);
+		}
 	}
 }
