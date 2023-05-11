@@ -123,7 +123,7 @@ public class CartItemController {
 					for (ProductQuantity pQ: cI.getProduct().getProductQuantities()) {
 						if (pQ.getSize().trim().equals(size.trim())) {
 							if (pQ.getQuantity() < newQuantity) {
-								return new ResponseEntity<Response>(new Response(false, "Thêm thất bại", null), HttpStatus.BAD_REQUEST);
+								return new ResponseEntity<Response>(new Response(false, "Số lượng thêm đã vượt quá số lượng sản phẩm hiện có", null), HttpStatus.BAD_REQUEST);
 							}
 						}
 					}
