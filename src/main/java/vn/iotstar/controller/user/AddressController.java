@@ -2,6 +2,7 @@ package vn.iotstar.controller.user;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,28 @@ public class AddressController {
 		Optional<User> optUser = userRepository.findById(userId);
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		String message = "";
+		if (optUser.isEmpty()) {
+			return new ResponseEntity<Response>(new Response(false, "Người dùng không tồn tại", null), HttpStatus.NOT_FOUND); 
+		}
 		
 		if (optAddress.isPresent()) {
 			message = "Cập nhật thông tin địa chỉ thành công";
+			address.setCreateAt(optAddress.get().getCreateAt());
 			address.setUpdateAt(timestamp);
 			address.setUser(optUser.get());
-			addressRepository.save(address);
 		} else {
+			message = "Thêm địa chỉ thành công";
 			address.setUser(optUser.get());
 			address.setCreateAt(timestamp);
-			addressRepository.save(address);
 		}
-		return new ResponseEntity<Response>(new Response(true, "Thành công", address), HttpStatus.OK);
+		if (address.getIsDefault() == true) {
+			List<Address> addressList = addressRepository.findByUser(optUser.get());
+			for (Address adr : addressList) {
+				adr.setIsDefault(false);
+				addressRepository.save(adr);
+			}
+		}
+		return new ResponseEntity<Response>(new Response(true, message, address), HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "/{id}")
