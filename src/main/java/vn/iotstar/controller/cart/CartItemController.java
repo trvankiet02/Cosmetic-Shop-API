@@ -75,6 +75,8 @@ public class CartItemController {
 	}
 	@PutMapping(path = "/updateCartItem")
 	public ResponseEntity<?> updateCartItem(@Valid @RequestParam("cartItem") CartItem cartItem){
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		cartItem.setUpdateAt(timestamp);
 		cartItemRepository.save(cartItem);
 		return new ResponseEntity<Response>(new Response(true, "Cập nhật thành công", cartItemRepository.findById(cartItem.getId())), HttpStatus.OK);
 	}
