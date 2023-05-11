@@ -100,6 +100,7 @@ public class OrderController {
 	            order.setDelivery(optDelivery.get());
 	            order.setStore(storeRepository.findById(storeId).get());
 	            order.setAddress(address.trim());
+	            order.setName(name.trim());
 	            order.setPhone(phone.trim());
 	            order.setPrice(priceEstimate(cartItemList, storeId));
 	            order.setStatus(0);
