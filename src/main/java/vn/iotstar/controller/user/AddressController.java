@@ -79,6 +79,7 @@ public class AddressController {
 		if (optAddress.isEmpty()) {
 			return new ResponseEntity<Response>(new Response(false, "Không tìm thấy địa chỉ", null), HttpStatus.NOT_FOUND);
 		} else {
+			addressRepository.delete(optAddress.get());
 			return new ResponseEntity<Response>(new Response(true, "Xoá địa chỉ thành công", null), HttpStatus.OK);
 		}
 	}
