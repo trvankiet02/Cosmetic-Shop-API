@@ -76,8 +76,9 @@ public class CartItemController {
 		return new ResponseEntity<Response>(new Response(false, "Quá trình xử lý gặp lỗi", null), HttpStatus.BAD_REQUEST);
 	}
 	@PutMapping(path = "/updateCartItem")
-	public ResponseEntity<?> updateCartItem(@RequestBody CartItem cartItem){
+	public ResponseEntity<?> updateCartItem(@RequestBody CartItem cartItem, @RequestParam("cartId") Integer cartId){
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		cartItem.setCart(cartRepository.findById(cartId).get());
 		cartItem.setUpdateAt(timestamp);
 		cartItemRepository.save(cartItem);
 		return new ResponseEntity<Response>(new Response(true, "Cập nhật thành công", cartItemRepository.findById(cartItem.getId())), HttpStatus.OK);
