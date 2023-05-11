@@ -40,7 +40,6 @@ public class CartItem {
 	private Cart cart;
 	
 	//private int productId;
-	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "productId")
 	private Product product;
