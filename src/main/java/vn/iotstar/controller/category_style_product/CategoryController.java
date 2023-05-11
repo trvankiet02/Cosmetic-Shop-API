@@ -42,6 +42,11 @@ public class CategoryController {
 
 	@Autowired
 	private Cloudinary cloudinary;
+	
+	@GetMapping(path = "/getCategoryByIsSelling")
+	public ResponseEntity<?> getCategoryByIsSelling(){
+		return new ResponseEntity<Response>(new Response(true, "Thành công", categoryRepository.findByIsSelling(true)), HttpStatus.OK);
+	}
 
 	@GetMapping
 	public ResponseEntity<?> getAllCategory() {
