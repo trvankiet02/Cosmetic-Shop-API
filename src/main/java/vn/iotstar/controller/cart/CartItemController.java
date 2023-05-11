@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -74,7 +75,7 @@ public class CartItemController {
 		return new ResponseEntity<Response>(new Response(false, "Quá trình xử lý gặp lỗi", null), HttpStatus.BAD_REQUEST);
 	}
 	@PutMapping(path = "/updateCartItem")
-	public ResponseEntity<?> updateCartItem(@Valid @RequestParam("cartItem") CartItem cartItem){
+	public ResponseEntity<?> updateCartItem(@RequestBody CartItem cartItem){
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		cartItem.setUpdateAt(timestamp);
 		cartItemRepository.save(cartItem);
