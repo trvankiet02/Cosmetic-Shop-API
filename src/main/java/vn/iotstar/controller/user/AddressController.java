@@ -61,6 +61,7 @@ public class AddressController {
 				addressRepository.save(adr);
 			}
 		}
+		addressRepository.save(address);
 		return new ResponseEntity<Response>(new Response(true, message, address), HttpStatus.OK);
 	}
 	
