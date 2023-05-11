@@ -103,7 +103,7 @@ public class OrderController {
 	            order.setName(name.trim());
 	            order.setPhone(phone.trim());
 	            order.setPrice(priceEstimate(cartItemList, storeId));
-	            order.setStatus(0);
+	            order.setStatus(1);
 	            order.setCreateAt(timestamp);
 	            orderMap.put(storeId, order);
 	        }
