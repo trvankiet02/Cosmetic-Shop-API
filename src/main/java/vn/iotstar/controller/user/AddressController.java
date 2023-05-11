@@ -52,8 +52,13 @@ public class AddressController {
 		return new ResponseEntity<Response>(new Response(true, "Thành công", address), HttpStatus.OK);
 	}
 	
-	@GetMapping (path = "/{id}")
+	@GetMapping(path = "/{id}")
 	public ResponseEntity<?> getAddress(@PathVariable Integer id){
-		return new ResponseEntity<Response>(new Response(true, "Thành công", addressRepository.findById(id).get()), HttpStatus.OK);
+	    Optional<Address> address = addressRepository.findById(id);
+	    if (address.isPresent()) {
+	        return new ResponseEntity<Response>(new Response(true, "Thành công", address.get()), HttpStatus.OK);
+	    } else {
+	        return new ResponseEntity<Response>(new Response(false, "Không tìm thấy địa chỉ", null), HttpStatus.NOT_FOUND);
+	    }
 	}
 }
