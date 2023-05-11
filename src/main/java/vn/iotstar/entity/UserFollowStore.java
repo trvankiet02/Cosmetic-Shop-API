@@ -35,7 +35,6 @@ public class UserFollowStore {
 	private Integer id;
 	
 	//private int userId;
-	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "userId")
 	private User user;
