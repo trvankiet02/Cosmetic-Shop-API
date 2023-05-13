@@ -128,7 +128,7 @@ public class OrderController {
 			}
 		}
 		orderRepository.save(optOrder.get());
-		return new ResponseEntity<Response>(new Response(true, "Huỷ đơn thành công", null), HttpStatus.OK);
+		return new ResponseEntity<Response>(new Response(true, "Huỷ đơn thành công", optOrder.get()), HttpStatus.OK);
 	}
 	@PostMapping(path = "/receiveOrder")
 	public ResponseEntity<?> receiveOrder(@Validated @RequestParam("orderId") Integer orderId){
@@ -142,7 +142,7 @@ public class OrderController {
 			productRepository.save(product);
 		}
 		orderRepository.save(optOrder.get());
-		return new ResponseEntity<Response>(new Response(true, "Nhận hàng thành công", null), HttpStatus.OK);
+		return new ResponseEntity<Response>(new Response(true, "Nhận hàng thành công", optOrder.get()), HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/addOrder")
