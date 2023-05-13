@@ -28,12 +28,15 @@ import vn.iotstar.entity.Delivery;
 import vn.iotstar.entity.Order;
 import vn.iotstar.entity.OrderItem;
 import vn.iotstar.entity.Product;
+import vn.iotstar.entity.ProductQuantity;
 import vn.iotstar.entity.User;
 import vn.iotstar.entity.Voucher;
 import vn.iotstar.repository.CartItemRepository;
 import vn.iotstar.repository.DeliveryRepository;
 import vn.iotstar.repository.OrderItemRepository;
 import vn.iotstar.repository.OrderRepository;
+import vn.iotstar.repository.ProductQuantityRepository;
+import vn.iotstar.repository.ProductRepository;
 import vn.iotstar.repository.StoreRepository;
 import vn.iotstar.repository.UserRepository;
 import vn.iotstar.repository.VoucherRepository;
@@ -62,6 +65,12 @@ public class OrderController {
 	
 	@Autowired 
 	private VoucherRepository voucherRepository;
+	
+	@Autowired
+	private ProductQuantityRepository productQuantityRepository;
+	
+	@Autowired
+	private ProductRepository productRepository;
 	
 
 	@GetMapping
@@ -102,6 +111,39 @@ public class OrderController {
 			
 		}
 	}
+	@PostMapping(path="/cancelOrder")
+	public ResponseEntity<?> cancelOrder(@Validated @RequestParam("orderId") Integer orderId){
+		Optional<Order> optOrder = orderRepository.findById(orderId);
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		optOrder.get().setStatus(0);
+		optOrder.get().setUpdateAt(timestamp);
+		for (OrderItem orderItem: optOrder.get().getOrderItems()) {
+			Product product = orderItem.getProduct();
+			for (ProductQuantity productQuantity: product.getProductQuantities()) {
+				if (productQuantity.getSize().trim().equals(orderItem.getSize().trim())) {
+					productQuantity.setQuantity(productQuantity.getQuantity() + orderItem.getQuantity());
+					productQuantity.setUpdateAt(timestamp);
+					productQuantityRepository.save(productQuantity);
+				}
+			}
+		}
+		orderRepository.save(optOrder.get());
+		return new ResponseEntity<Response>(new Response(true, "Huỷ đơn thành công", null), HttpStatus.OK);
+	}
+	@PostMapping(path = "/receiveOrder")
+	public ResponseEntity<?> receiveOrder(@Validated @RequestParam("orderId") Integer orderId){
+		Optional<Order> optOrder = orderRepository.findById(orderId);
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		optOrder.get().setStatus(4);
+		optOrder.get().setUpdateAt(timestamp);
+		for (OrderItem orderItem: optOrder.get().getOrderItems()) {
+			Product product = orderItem.getProduct();
+			product.setSold(product.getSold() + orderItem.getQuantity());
+			productRepository.save(product);
+		}
+		orderRepository.save(optOrder.get());
+		return new ResponseEntity<Response>(new Response(true, "Nhận hàng thành công", null), HttpStatus.OK);
+	}
 
 	@PostMapping(path = "/addOrder")
 	public ResponseEntity<?> addOrder(@Validated @RequestParam("cartItemIdList") List<Integer> cartItemIdList,
@@ -123,6 +165,14 @@ public class OrderController {
 		for (Integer cartItemId : cartItemIdList) {
 			Optional<CartItem> optCartItem = cartItemRepository.findById(cartItemId);
 			cartItemList.add(optCartItem.get());
+			Product product = optCartItem.get().getProduct();
+			for (ProductQuantity productQuantity: product.getProductQuantities()) {
+				if (productQuantity.getSize().trim().equals(optCartItem.get().getSize().trim())) {
+					productQuantity.setQuantity(productQuantity.getQuantity() - optCartItem.get().getQuantity());
+					productQuantity.setUpdateAt(timestamp);
+					productQuantityRepository.save(productQuantity);
+				}
+			}
 		}
 
 		// Tạo danh sách các đơn hàng dựa trên Store và lưu vào cơ sở dữ liệu
