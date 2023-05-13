@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,6 +61,17 @@ public class OrderController {
 	@GetMapping
 	public ResponseEntity<?> getAllOrder() {
 		return new ResponseEntity<Response>(new Response(true, "Thành công", orderRepository.findAll()), HttpStatus.OK);
+	}
+	
+	@GetMapping(path = "/{id}")
+	public ResponseEntity<?> getOrderDetail(@PathVariable Integer id){
+		Optional<Order> optOrder = orderRepository.findById(id);
+		if (optOrder.isPresent()) {
+			return new ResponseEntity<Response>(new Response(true, "Thành công", optOrder.get()), HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<Response>(new Response(false, "Đơn hàng không tồn tại", null), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@PostMapping(path = "/getOrder")
