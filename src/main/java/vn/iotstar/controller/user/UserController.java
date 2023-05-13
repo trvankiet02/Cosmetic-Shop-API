@@ -73,7 +73,7 @@ public class UserController {
 		}
 	}
 	@PostMapping(path = "/updateAvatar")
-	public ResponseEntity<?> updateAvatar(@Validated @RequestParam("userId") Integer userId,
+	public ResponseEntity<?> updateAvatar(@RequestParam("userId") Integer userId,
 			@RequestParam("image") MultipartFile image){
 		Optional<User> optUser = userRepository.findById(userId);
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
