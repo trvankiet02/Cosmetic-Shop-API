@@ -29,12 +29,14 @@ import vn.iotstar.entity.Order;
 import vn.iotstar.entity.OrderItem;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.User;
+import vn.iotstar.entity.Voucher;
 import vn.iotstar.repository.CartItemRepository;
 import vn.iotstar.repository.DeliveryRepository;
 import vn.iotstar.repository.OrderItemRepository;
 import vn.iotstar.repository.OrderRepository;
 import vn.iotstar.repository.StoreRepository;
 import vn.iotstar.repository.UserRepository;
+import vn.iotstar.repository.VoucherRepository;
 
 @RestController
 @RequestMapping(path = "/api/order")
@@ -57,6 +59,10 @@ public class OrderController {
 
 	@Autowired
 	private StoreRepository storeRepository;
+	
+	@Autowired 
+	private VoucherRepository voucherRepository;
+	
 
 	@GetMapping
 	public ResponseEntity<?> getAllOrder() {
@@ -101,8 +107,13 @@ public class OrderController {
 	public ResponseEntity<?> addOrder(@Validated @RequestParam("cartItemIdList") List<Integer> cartItemIdList,
 			@Validated @RequestParam("userId") Integer userId, @Validated @RequestParam("name") String name,
 			@Validated @RequestParam("deliveryId") Integer deliveryId,
-			@Validated @RequestParam("address") String address, @Validated @RequestParam("phone") String phone) {
+			@Validated @RequestParam("address") String address, @Validated @RequestParam("phone") String phone,
+			@Validated @RequestParam("voucherId") Integer voucherId,
+			@Validated @RequestParam("totalPrice") Integer totalPrice) {
+		// tong price*quantity cua tung mon * 110% - phieu giam gia = unit price
+		//total price truyền vào
 		Optional<User> optUser = userRepository.findById(userId);
+		Optional<Voucher> optVoucher = voucherRepository.findById(voucherId);
 		Optional<Delivery> optDelivery = deliveryRepository.findById(deliveryId);
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		List<CartItem> cartItemList = new ArrayList<>();
@@ -126,8 +137,9 @@ public class OrderController {
 				order.setAddress(address.trim());
 				order.setName(name.trim());
 				order.setPhone(phone.trim());
-				order.setPrice(priceEstimate(cartItemList, storeId));
+				order.setPrice(priceEstimate(cartItemList, storeId, optVoucher));
 				order.setStatus(1);
+				order.setVoucher(optVoucher.get());
 				order.setCreateAt(timestamp);
 				orderMap.put(storeId, order);
 			}
@@ -144,7 +156,12 @@ public class OrderController {
 			orderItem.setSize(cartItem.getSize());
 			orderItem.setQuantity(cartItem.getQuantity());
 			orderItem.setCreateAt(timestamp);
-			orderItem.setUnitPrice(cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice());
+			Integer unitPrice = cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice();
+			if (unitPrice*optVoucher.get().getDiscount() > optVoucher.get().getMaxDiscount()) {
+				orderItem.setUnitPrice((int) (unitPrice*1.1 - optVoucher.get().getMaxDiscount()));
+			} else {
+				orderItem.setUnitPrice((int) (unitPrice*1.1*(1 - optVoucher.get().getDiscount())));
+			}
 			Order order = orderMap.get(cartItem.getProduct().getStore().getId());
 			orderItem.setOrder(order);
 			orderItemRepository.save(orderItem);
@@ -154,16 +171,23 @@ public class OrderController {
 		for (CartItem cartItem : cartItemList) {
 			cartItemRepository.delete(cartItem);
 		}
+		optVoucher.get().setQuantity(optVoucher.get().getQuantity() - 1);
+		voucherRepository.save(optVoucher.get());
 		// return ResponseEntity.ok().body(orderRepository.findByCreateAt(timestamp));
 		return new ResponseEntity<Response>(new Response(true, "Thành công", orderRepository.findByCreateAt(timestamp)),
 				HttpStatus.OK);
 	}
 
-	public Integer priceEstimate(List<CartItem> cartItemList, Integer storeId) {
+	public Integer priceEstimate(List<CartItem> cartItemList, Integer storeId, Optional<Voucher> optVoucher) {
 		Integer sum = 0;
 		for (CartItem cartItem : cartItemList) {
 			if (cartItem.getProduct().getStore().getId() == storeId) {
-				sum += cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice();
+				Integer unitPrice = cartItem.getQuantity() * cartItem.getProduct().getPromotionalPrice();
+				if (unitPrice*optVoucher.get().getDiscount() > optVoucher.get().getMaxDiscount()) {
+					sum += (int) (unitPrice*1.1 - optVoucher.get().getMaxDiscount());
+				} else {
+					sum += (int) (unitPrice*1.1*(1 - optVoucher.get().getDiscount()));
+				}
 			}
 		}
 		return sum;

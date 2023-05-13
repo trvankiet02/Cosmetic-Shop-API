@@ -56,6 +56,10 @@ public class Order {
 	@JoinColumn(name = "storeId")
 	private Store store;
 	
+	@ManyToOne
+	@JoinColumn(name = "voucherId")
+	private Voucher voucher;
+	
 	@Column(columnDefinition = "nvarchar(255)")
 	private String address;
 	
