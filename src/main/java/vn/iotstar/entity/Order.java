@@ -84,7 +84,6 @@ public class Order {
 	private List<OrderItem> orderItems;
 	
 	//mapping to Review
-	@JsonIgnore
 	@OneToOne(mappedBy = "order")
 	private Review review;
 }
