@@ -58,6 +58,8 @@ public class Product {
 
 	@Column(columnDefinition = "nvarchar(255)")
 	private String madeIn;
+	
+	private Integer sold;
 
 	// private int styleId;
 	@JsonIgnore

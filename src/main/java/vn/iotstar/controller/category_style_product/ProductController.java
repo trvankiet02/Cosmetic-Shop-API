@@ -189,6 +189,7 @@ public class ProductController {
 				product.setMadeOf(madeOf);
 				product.setColor(color);
 				product.setMadeIn(madeIn);
+				product.setSold(0);
 				product.setStore(storeRepository.findById(storeId).get());
 				product.setCategory(categoryRepository.findById(categoryId).get());
 				product.setStyle(styleRepository.findById(styleId).get());
