@@ -26,9 +26,10 @@ public class VoucherController {
 	private ResponseEntity<?> getAllVoucher(){
 		List<Voucher> voucherList = voucherRepository.findAll();
 		List<Voucher> returnList = new ArrayList<>();
+		Date now = new Date(System.currentTimeMillis());
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		for (Voucher voucher: voucherList) {
-			if (voucher.getExpireAt().after(timestamp) && voucher.getStatus() == true) {
+			if (voucher.getExpireAt().after(now) && voucher.getStatus() == true) {
 				returnList.add(voucher);
 			}
 		}
