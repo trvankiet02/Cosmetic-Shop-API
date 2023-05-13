@@ -1,5 +1,10 @@
 package vn.iotstar.controller.store_voucher;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.iotstar.Response;
+import vn.iotstar.entity.Voucher;
 import vn.iotstar.repository.VoucherRepository;
 
 @RestController
@@ -18,6 +24,14 @@ public class VoucherController {
 
 	@GetMapping
 	private ResponseEntity<?> getAllVoucher(){
-		return new ResponseEntity<Response>(new Response(true, "Thành công", voucherRepository.findAll()), HttpStatus.OK);
+		List<Voucher> voucherList = voucherRepository.findAll();
+		List<Voucher> returnList = new ArrayList<>();
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		for (Voucher voucher: voucherList) {
+			if (voucher.getExpireAt().after(timestamp) && voucher.getStatus() == true) {
+				returnList.add(voucher);
+			}
+		}
+		return new ResponseEntity<Response>(new Response(true, "Thành công", returnList), HttpStatus.OK);
 	}
 }
