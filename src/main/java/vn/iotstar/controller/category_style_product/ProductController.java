@@ -206,7 +206,8 @@ public class ProductController {
 			@Validated @RequestParam("categoryId") Integer categoryId,
 			@Validated @RequestParam("storeId") Integer storeId,
 			@Validated @RequestParam("sizeList") List<String> sizeList,
-			@Validated @RequestParam("quantityList") List<Integer> quantityList) {
+			@Validated @RequestParam("quantityList") List<Integer> quantityList,
+			@Validated @RequestParam("isSelling") Boolean isSelling) {
 		Optional<Product> optProduct = productRepository.findByName(productName);
 
 		if (optProduct.isPresent()) {
@@ -228,6 +229,7 @@ public class ProductController {
 				product.setColor(color);
 				product.setMadeIn(madeIn);
 				product.setSold(0);
+				product.setIsSelling(isSelling);
 				product.setStore(storeRepository.findById(storeId).get());
 				product.setCategory(categoryRepository.findById(categoryId).get());
 				product.setStyle(styleRepository.findById(styleId).get());
@@ -280,7 +282,8 @@ public class ProductController {
 			@Validated @RequestParam("categoryId") Integer categoryId,
 			@Validated @RequestParam("storeId") Integer storeId,
 			@Validated @RequestParam("sizeList") List<String> sizeList,
-			@Validated @RequestParam("quantityList") List<Integer> quantityList) {
+			@Validated @RequestParam("quantityList") List<Integer> quantityList,
+			@Validated @RequestParam("isSelling") Boolean isSelling) {
 
 		Optional<Product> optProduct = productRepository.findById(productId);
 		if (optProduct.isEmpty()) {
@@ -297,6 +300,7 @@ public class ProductController {
 			optProduct.get().setColor(color);
 			optProduct.get().setMadeIn(madeIn);
 			//product.setSold(0);
+			optProduct.get().setIsSelling(isSelling);
 			optProduct.get().setStore(storeRepository.findById(storeId).get());
 			optProduct.get().setCategory(categoryRepository.findById(categoryId).get());
 			optProduct.get().setStyle(styleRepository.findById(styleId).get());
