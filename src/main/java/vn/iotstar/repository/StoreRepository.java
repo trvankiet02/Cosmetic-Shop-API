@@ -8,10 +8,13 @@ import org.springframework.stereotype.Repository;
 
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.Store;
+import vn.iotstar.entity.User;
 
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Integer>{
 
 	Optional<Store> findByProducts(Product product);
+	
+	Optional<Store> findByUser(User user);
 	
 }

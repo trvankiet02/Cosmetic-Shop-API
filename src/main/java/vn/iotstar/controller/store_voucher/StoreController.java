@@ -46,6 +46,21 @@ public class StoreController {
 			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@PostMapping(path = "/getStoreByUser")
+	public ResponseEntity<?> getStoreByUser(@Validated @RequestParam("userId") Integer userId){
+		Optional<User> optUser = userRepository.findById(userId);
+		if (optUser.isPresent()) {
+			if (optUser.get().getStore() != null) {
+				return new ResponseEntity<Response>(new Response(true, "Thành công", optUser.get().getStore()), HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<Response>(new Response(false, "Người dùng chưa có cửa hàng hoặc chưa là người bán", null), HttpStatus.BAD_REQUEST); 
+			}
+		} else {
+			return new ResponseEntity<Response>(new Response(false, "Người dùng không tồn tại", null), HttpStatus.BAD_REQUEST); 
+		}
+	}
 
 	@PostMapping(path = "/signup")
 	public ResponseEntity<?> storeSignUp(@Validated @RequestParam("userId") Integer userId,
