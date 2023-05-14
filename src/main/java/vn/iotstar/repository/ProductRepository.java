@@ -1,5 +1,6 @@
 package vn.iotstar.repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
@@ -27,6 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer>{
 	List<Product> findByStore(Store store);
 	
 	List<Product> findByStoreAndIsSelling(Store store, Boolean isSelling, Sort sort);
+	
+	Optional<Product> findByCreateAt(Date createAt);
 	
 
 }

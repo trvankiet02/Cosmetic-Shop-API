@@ -31,10 +31,12 @@ import vn.iotstar.Response;
 import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.ProductImage;
+import vn.iotstar.entity.ProductQuantity;
 import vn.iotstar.entity.Store;
 import vn.iotstar.entity.Style;
 import vn.iotstar.repository.CategoryRepository;
 import vn.iotstar.repository.ProductImageRepository;
+import vn.iotstar.repository.ProductQuantityRepository;
 import vn.iotstar.repository.ProductRepository;
 import vn.iotstar.repository.StoreRepository;
 import vn.iotstar.repository.StyleRepository;
@@ -57,6 +59,9 @@ public class ProductController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private ProductQuantityRepository productQuantityRepository;
 
 	@Autowired
 	private Cloudinary cloudinary;
@@ -196,7 +201,9 @@ public class ProductController {
 			@Validated @RequestParam("madeOf") String madeOf, @Validated @RequestParam("color") String color,
 			@Validated @RequestParam("madeIn") String madeIn, @Validated @RequestParam("styleId") Integer styleId,
 			@Validated @RequestParam("categoryId") Integer categoryId,
-			@Validated @RequestParam("storeId") Integer storeId) {
+			@Validated @RequestParam("storeId") Integer storeId,
+			@Validated @RequestParam("sizeList") List<String> sizeList,
+			@Validated @RequestParam("quantityList") List<Integer> quantityList) {
 		Optional<Product> optProduct = productRepository.findByName(productName);
 
 		if (optProduct.isPresent()) {
@@ -225,7 +232,7 @@ public class ProductController {
 
 				productRepository.save(product);
 
-				optProduct = productRepository.findByName(product.getName());
+				optProduct = productRepository.findByCreateAt(timestamp);
 				for (MultipartFile multipartFile : productImages) {
 					ProductImage productImage = new ProductImage();
 					productImage.setProduct(optProduct.get());
@@ -241,6 +248,14 @@ public class ProductController {
 					productImage.setCreateAt(timestamp);
 
 					productImageRepository.save(productImage);
+				}
+				for (int i = 0; i < quantityList.size(); i++) {
+					ProductQuantity productQuantity = new ProductQuantity();
+					productQuantity.setSize(sizeList.get(i).trim().toUpperCase());
+					productQuantity.setQuantity(quantityList.get(i));
+					productQuantity.setCreateAt(timestamp);
+					productQuantity.setProduct(optProduct.get());
+					productQuantityRepository.save(productQuantity);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
