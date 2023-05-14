@@ -64,24 +64,24 @@ public class ReviewController {
 
 	@PostMapping(path = "/getReview")
 	public ResponseEntity<?> getReview(@Validated @RequestParam("productId") Integer productId) {
-		// order -> orderItem -> cartItem -> product
-		Product product = productRepository.findById(productId).get();
-		List<Order> orders = new ArrayList<>();
-		for (OrderItem orderItem : product.getOrderItems()) {
-			if (orderItem != null) {
-				Order order = orderItem.getOrder();
-				if (order != null) {
-					orders.add(order);
-				}
-			}
-		}
+	    // order -> orderItem -> cartItem -> product
+	    Product product = productRepository.findById(productId).get();
+	    List<Order> orders = new ArrayList<>();
+	    for (OrderItem orderItem : product.getOrderItems()) {
+	        if (orderItem != null) {
+	            Order order = orderItem.getOrder();
+	            if (order != null && order.getReview() != null) {
+	                orders.add(order);
+	            }
+	        }
+	    }
 
-		List<Review> reviews = new ArrayList<>();
-		for (Order order : orders) {
-			reviews.add(order.getReview());
-		}
-		//return ResponseEntity.ok().body(reviews);
-		return new ResponseEntity<Response>(new Response(true, "Thành công", reviews), HttpStatus.OK);
+	    List<Review> reviews = new ArrayList<>();
+	    for (Order order : orders) {
+	        reviews.add(order.getReview());
+	    }
+	    
+	    return new ResponseEntity<Response>(new Response(true, "Thành công", reviews), HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/addReview")
