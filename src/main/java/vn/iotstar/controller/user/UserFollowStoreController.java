@@ -39,13 +39,15 @@ public class UserFollowStoreController {
 	private StoreRepository storeRepository;
 	
 	@PostMapping(path = "/getFollowStore")
-	public ResponseEntity<?> getFollowStore(@Validated @RequestParam("userId") Integer userId) {
+	public ResponseEntity<?> getFollowStore(@Validated @RequestParam("userId") Integer userId,
+			@Validated @RequestParam("storeId") Integer storeId) {
 		Optional<User> optUser = userRepository.findById(userId);
+		Optional<Store> optStore = storeRepository.findById(storeId);
 		if (optUser.isEmpty()) {
 			return new ResponseEntity<Response>(new Response(false, "Người dùng không tồn tại", null),
 					HttpStatus.BAD_REQUEST);
 		} else {
-			List<UserFollowStore> optUserFollowStoreList = userFollowStoreRepository.findByUser(optUser.get());
+			Optional<UserFollowStore> optUserFollowStoreList = userFollowStoreRepository.findByUserAndStore(optUser.get(), optStore.get());
 			return new ResponseEntity<Response>(new Response(true, "Thành công", optUserFollowStoreList), HttpStatus.OK);
 		}
 	}
