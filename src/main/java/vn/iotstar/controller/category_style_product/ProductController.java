@@ -76,19 +76,36 @@ public class ProductController {
 				HttpStatus.OK);
 
 	}
+	
+	@PostMapping(path = "/getSoldProduct") 
+	public ResponseEntity<?> getProductSold(@Validated @RequestParam("storeId") Integer storeId){
+		Optional<Store> optStore = storeRepository.findById(storeId);
+		Sort sort = Sort.by(Sort.Direction.DESC, "sold");
+		List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), true, sort);
+		return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
+	}
+	
+	@PostMapping(path = "/getNewProduct") 
+	public ResponseEntity<?> getProductNew(@Validated @RequestParam("storeId") Integer storeId){
+		Optional<Store> optStore = storeRepository.findById(storeId);
+		Sort sort = Sort.by(Sort.Direction.DESC, "createAt");
+		List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), true, sort);
+		return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
+	}
 
 	@GetMapping
 	public ResponseEntity<?> getAllProduct() {
 		return new ResponseEntity<Response>(new Response(true, "Thành công", productRepository.findByIsSelling(true)),
 				HttpStatus.OK);
 	}
+	
 
 	@PostMapping(path = "/getProductByStore")
-	public ResponseEntity<?> getProductByStoreId(@Validated @RequestParam("storeId") Integer storeId) {
+	public ResponseEntity<?> getProductByStoreId(@Validated @RequestParam("storeId") Integer storeId, @Validated @RequestParam("isSelling") Boolean isSelling) {
 		Optional<Store> optStore = storeRepository.findById(storeId);
 
 		if (optStore.isPresent()) {
-			List<Product> productList = productRepository.findByStore(optStore.get());
+			List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), isSelling, Sort.by(Sort.DEFAULT_DIRECTION));
 			return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
