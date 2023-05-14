@@ -59,7 +59,7 @@ public class ProductController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
-	
+
 	@Autowired
 	private ProductQuantityRepository productQuantityRepository;
 
@@ -81,17 +81,17 @@ public class ProductController {
 				HttpStatus.OK);
 
 	}
-	
-	@PostMapping(path = "/getSoldProduct") 
-	public ResponseEntity<?> getProductSold(@Validated @RequestParam("storeId") Integer storeId){
+
+	@PostMapping(path = "/getSoldProduct")
+	public ResponseEntity<?> getProductSold(@Validated @RequestParam("storeId") Integer storeId) {
 		Optional<Store> optStore = storeRepository.findById(storeId);
 		Sort sort = Sort.by(Sort.Direction.DESC, "sold");
 		List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), true, sort);
 		return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
 	}
-	
-	@PostMapping(path = "/getNewProduct") 
-	public ResponseEntity<?> getProductNew(@Validated @RequestParam("storeId") Integer storeId){
+
+	@PostMapping(path = "/getNewProduct")
+	public ResponseEntity<?> getProductNew(@Validated @RequestParam("storeId") Integer storeId) {
 		Optional<Store> optStore = storeRepository.findById(storeId);
 		Sort sort = Sort.by(Sort.Direction.DESC, "createAt");
 		List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), true, sort);
@@ -103,7 +103,7 @@ public class ProductController {
 		return new ResponseEntity<Response>(new Response(true, "Thành công", productRepository.findByIsSelling(true)),
 				HttpStatus.OK);
 	}
-	
+
 	@PostMapping(path = "/getAllProductByStore")
 	public ResponseEntity<?> getAllProductByStore(@Validated @RequestParam("storeId") Integer storeId) {
 		Optional<Store> optStore = storeRepository.findById(storeId);
@@ -117,11 +117,13 @@ public class ProductController {
 	}
 
 	@PostMapping(path = "/getProductByStore")
-	public ResponseEntity<?> getProductByStoreId(@Validated @RequestParam("storeId") Integer storeId, @Validated @RequestParam("isSelling") Boolean isSelling) {
+	public ResponseEntity<?> getProductByStoreId(@Validated @RequestParam("storeId") Integer storeId,
+			@Validated @RequestParam("isSelling") Boolean isSelling) {
 		Optional<Store> optStore = storeRepository.findById(storeId);
 
 		if (optStore.isPresent()) {
-			List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), isSelling, Sort.by(Sort.DEFAULT_DIRECTION));
+			List<Product> productList = productRepository.findByStoreAndIsSelling(optStore.get(), isSelling,
+					Sort.by(Sort.DEFAULT_DIRECTION));
 			return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
@@ -169,7 +171,8 @@ public class ProductController {
 	}
 
 	@PostMapping(path = "/getProductByStyle")
-	public ResponseEntity<?> getProductByStyle(@Validated @RequestParam("styleId") Integer styleId, @Validated @RequestParam("isSelling") Boolean isSelling) {
+	public ResponseEntity<?> getProductByStyle(@Validated @RequestParam("styleId") Integer styleId,
+			@Validated @RequestParam("isSelling") Boolean isSelling) {
 		Optional<Style> optStyle = styleRepository.findById(styleId);
 		String message = "";
 		if (optStyle.isEmpty()) {
@@ -263,5 +266,74 @@ public class ProductController {
 			// return ResponseEntity.ok().body(product);
 			return new ResponseEntity<Response>(new Response(true, "Thành công", product), HttpStatus.OK);
 		}
+	}
+
+	@PostMapping(path = "/updateProduct")
+	public ResponseEntity<?> updateProduct(@Validated @RequestParam("productId") Integer productId,
+			@Validated @RequestParam("productName") String productName,
+			@RequestParam("productImages") MultipartFile[] productImages,
+			@Validated @RequestParam("productPrice") Integer productPrice,
+			@Validated @RequestParam("productPromotionalPrice") Integer promotionalPrice,
+			@Validated @RequestParam("productDescription") String productDescription,
+			@Validated @RequestParam("madeOf") String madeOf, @Validated @RequestParam("color") String color,
+			@Validated @RequestParam("madeIn") String madeIn, @Validated @RequestParam("styleId") Integer styleId,
+			@Validated @RequestParam("categoryId") Integer categoryId,
+			@Validated @RequestParam("storeId") Integer storeId,
+			@Validated @RequestParam("sizeList") List<String> sizeList,
+			@Validated @RequestParam("quantityList") List<Integer> quantityList) {
+
+		Optional<Product> optProduct = productRepository.findById(productId);
+		if (optProduct.isEmpty()) {
+			return new ResponseEntity<Response>(new Response(false, "Thành công", null), HttpStatus.BAD_REQUEST);
+		}
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+
+		try {
+			optProduct.get().setName(productName);
+			optProduct.get().setPrice(productPrice);
+			optProduct.get().setPromotionalPrice(promotionalPrice);
+			optProduct.get().setDescription(productDescription);
+			optProduct.get().setMadeOf(madeOf);
+			optProduct.get().setColor(color);
+			optProduct.get().setMadeIn(madeIn);
+			//product.setSold(0);
+			optProduct.get().setStore(storeRepository.findById(storeId).get());
+			optProduct.get().setCategory(categoryRepository.findById(categoryId).get());
+			optProduct.get().setStyle(styleRepository.findById(styleId).get());
+			optProduct.get().setUpdateAt(timestamp);
+
+			productRepository.save(optProduct.get());
+
+			//optProduct = productRepository.findByCreateAt(timestamp);
+			for (MultipartFile multipartFile : productImages) {
+				ProductImage productImage = new ProductImage();
+				productImage.setProduct(optProduct.get());
+				try {
+					Map map = this.cloudinary.uploader().upload(multipartFile.getBytes(),
+							ObjectUtils.asMap("resource_type", "auto"));
+					String img = (String) map.get("secure_url");
+
+					productImage.setImage(img);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				productImage.setCreateAt(timestamp);
+
+				productImageRepository.save(productImage);
+			}
+			for (int i = 0; i < quantityList.size(); i++) {
+				ProductQuantity productQuantity = new ProductQuantity();
+				productQuantity.setSize(sizeList.get(i).trim().toUpperCase());
+				productQuantity.setQuantity(quantityList.get(i));
+				productQuantity.setCreateAt(timestamp);
+				productQuantity.setProduct(optProduct.get());
+				productQuantityRepository.save(productQuantity);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// return ResponseEntity.ok().body(product);
+		return new ResponseEntity<Response>(new Response(true, "Thành công", optProduct.get()), HttpStatus.OK);
+
 	}
 }
