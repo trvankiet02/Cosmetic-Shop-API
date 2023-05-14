@@ -130,6 +130,28 @@ public class OrderController {
 		orderRepository.save(optOrder.get());
 		return new ResponseEntity<Response>(new Response(true, "Huỷ đơn thành công", optOrder.get()), HttpStatus.OK);
 	}
+	
+	@PostMapping(path="/confirmOrder")
+	public ResponseEntity<?> confirmOrder(@Validated @RequestParam("orderId") Integer orderId){
+		Optional<Order> optOrder = orderRepository.findById(orderId);
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		optOrder.get().setStatus(2);
+		optOrder.get().setUpdateAt(timestamp);
+		orderRepository.save(optOrder.get());
+		return new ResponseEntity<Response>(new Response(true, "Xác nhận đơn hàng thành công", optOrder.get()), HttpStatus.OK);
+	}
+	
+	@PostMapping(path="/shipOrder")
+	public ResponseEntity<?> shipOrder(@Validated @RequestParam("orderId") Integer orderId){
+		Optional<Order> optOrder = orderRepository.findById(orderId);
+		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
+		optOrder.get().setStatus(3);
+		optOrder.get().setUpdateAt(timestamp);
+		orderRepository.save(optOrder.get());
+		return new ResponseEntity<Response>(new Response(true, "Đơn hàng đang được giao", optOrder.get()), HttpStatus.OK);
+	}
+	
+	
 	@PostMapping(path = "/receiveOrder")
 	public ResponseEntity<?> receiveOrder(@Validated @RequestParam("orderId") Integer orderId){
 		Optional<Order> optOrder = orderRepository.findById(orderId);
