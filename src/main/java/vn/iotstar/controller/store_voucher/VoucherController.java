@@ -29,7 +29,7 @@ public class VoucherController {
 		Date now = new Date(System.currentTimeMillis());
 		Timestamp timestamp = new Timestamp(new Date(System.currentTimeMillis()).getTime());
 		for (Voucher voucher: voucherList) {
-			if (voucher.getExpireAt().after(now) && voucher.getStatus() == true) {
+			if (voucher.getExpireAt().after(now) && voucher.getStatus() == true && voucher.getQuantity() > 0) {
 				returnList.add(voucher);
 			}
 		}
