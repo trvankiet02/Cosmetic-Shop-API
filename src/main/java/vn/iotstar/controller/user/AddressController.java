@@ -53,6 +53,9 @@ public class AddressController {
 			message = "Thêm địa chỉ thành công";
 			address.setUser(optUser.get());
 			address.setCreateAt(timestamp);
+			if (optUser.get().getAddresses().size() == 0) {
+				address.setIsDefault(true);
+			}
 		}
 		if (address.getIsDefault() == true) {
 			List<Address> addressList = addressRepository.findByUser(optUser.get());
