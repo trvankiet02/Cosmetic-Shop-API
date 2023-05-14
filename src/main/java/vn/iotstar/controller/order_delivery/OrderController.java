@@ -151,7 +151,8 @@ public class OrderController {
 			@Validated @RequestParam("deliveryId") Integer deliveryId,
 			@Validated @RequestParam("address") String address, @Validated @RequestParam("phone") String phone,
 			@Validated @RequestParam("voucherId") Integer voucherId,
-			@Validated @RequestParam("totalPrice") Integer totalPrice) {
+			@Validated @RequestParam("totalPrice") Integer totalPrice,
+			@Validated @RequestParam("payMethod") Integer payMethod) {
 		// tong price*quantity cua tung mon * 110% - phieu giam gia = unit price
 		//total price truyền vào
 		Optional<User> optUser = userRepository.findById(userId);
@@ -187,10 +188,12 @@ public class OrderController {
 				order.setAddress(address.trim());
 				order.setName(name.trim());
 				order.setPhone(phone.trim());
-				order.setPrice(priceEstimate(cartItemList, storeId, optVoucher));
+				//order.setPrice(priceEstimate(cartItemList, storeId, optVoucher));
+				order.setPrice(totalPrice);
 				order.setStatus(1);
 				order.setVoucher(optVoucher.get());
 				order.setCreateAt(timestamp);
+				order.setPayMethod(payMethod);
 				orderMap.put(storeId, order);
 			}
 
@@ -223,6 +226,11 @@ public class OrderController {
 		}
 		optVoucher.get().setQuantity(optVoucher.get().getQuantity() - 1);
 		voucherRepository.save(optVoucher.get());
+		
+		if (payMethod == 1) {
+			optUser.get().setEWallet(optUser.get().getEWallet() - totalPrice);
+			userRepository.save(optUser.get());
+		}
 		// return ResponseEntity.ok().body(orderRepository.findByCreateAt(timestamp));
 		return new ResponseEntity<Response>(new Response(true, "Thành công", orderRepository.findByCreateAt(timestamp)),
 				HttpStatus.OK);
