@@ -30,10 +30,10 @@ public class StoreController {
 
 	@Autowired
 	private StoreRepository storeRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private Cloudinary cloudinary;
 
@@ -46,19 +46,22 @@ public class StoreController {
 			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping(path = "/getStoreByUser")
-	public ResponseEntity<?> getStoreByUser(@Validated @RequestParam("userId") Integer userId){
+	public ResponseEntity<?> getStoreByUser(@Validated @RequestParam("userId") Integer userId) {
 		Optional<User> optUser = userRepository.findById(userId);
 		if (optUser.isPresent()) {
 			if (optUser.get().getStore() != null) {
-				return new ResponseEntity<Response>(new Response(true, "Thành công", optUser.get().getStore()), HttpStatus.OK);
-			}
-			else {
-				return new ResponseEntity<Response>(new Response(false, "Người dùng chưa có cửa hàng hoặc chưa là người bán", null), HttpStatus.BAD_REQUEST); 
+				return new ResponseEntity<Response>(new Response(true, "Thành công", optUser.get().getStore()),
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Response>(
+						new Response(false, "Người dùng chưa có cửa hàng hoặc chưa là người bán", null),
+						HttpStatus.BAD_REQUEST);
 			}
 		} else {
-			return new ResponseEntity<Response>(new Response(false, "Người dùng không tồn tại", null), HttpStatus.BAD_REQUEST); 
+			return new ResponseEntity<Response>(new Response(false, "Người dùng không tồn tại", null),
+					HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -92,8 +95,7 @@ public class StoreController {
 			optUser.get().setRole(1);
 			userRepository.save(optUser.get());
 			return new ResponseEntity<Response>(new Response(true, "Thành công", store), HttpStatus.OK);
-		}
-		else {
+		} else {
 			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
 		}
 	}

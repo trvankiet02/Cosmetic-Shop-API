@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import vn.iotstar.entity.Order;
+import vn.iotstar.entity.Store;
 import vn.iotstar.entity.User;
 
 @Repository
@@ -18,4 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
 	
 	List<Order> findByCreateAt(Date createAt);
 	
+	List<Order> findByStore(Store store);
+	
+	List<Order> findByStoreAndStatus(Store store, Integer status);
 }

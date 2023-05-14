@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import vn.iotstar.entity.Order;
 import vn.iotstar.entity.OrderItem;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.ProductQuantity;
+import vn.iotstar.entity.Store;
 import vn.iotstar.entity.User;
 import vn.iotstar.entity.Voucher;
 import vn.iotstar.repository.CartItemRepository;
@@ -86,6 +88,25 @@ public class OrderController {
 		}
 		else {
 			return new ResponseEntity<Response>(new Response(false, "Đơn hàng không tồn tại", null), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping(path = "/getOrderByStore")
+	public ResponseEntity<?> getOrderByStore(@Validated @RequestParam("storeId") Integer storeId,
+			@RequestParam(value = "status", required = false) Integer status){
+		Optional<Store> optStore = storeRepository.findById(storeId);
+		if (optStore.isPresent()) {
+			if (status == null) {
+				return new ResponseEntity<Response>(
+						new Response(true, "Thành công", orderRepository.findByStore(optStore.get())),
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Response>(
+						new Response(true, "Thành công", orderRepository.findByStoreAndStatus(optStore.get(), status)),
+						HttpStatus.OK); 
+			}
+		} else {
+			return new ResponseEntity<Response>(new Response(false, "Không tồn tại cửa hàng", null), HttpStatus.BAD_REQUEST);
 		}
 	}
 
