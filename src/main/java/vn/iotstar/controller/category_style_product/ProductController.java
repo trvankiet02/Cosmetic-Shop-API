@@ -99,6 +99,17 @@ public class ProductController {
 				HttpStatus.OK);
 	}
 	
+	@PostMapping(path = "/getAllProductByStore")
+	public ResponseEntity<?> getAllProductByStore(@Validated @RequestParam("storeId") Integer storeId) {
+		Optional<Store> optStore = storeRepository.findById(storeId);
+
+		if (optStore.isPresent()) {
+			List<Product> productList = productRepository.findByStore(optStore.get());
+			return new ResponseEntity<Response>(new Response(true, "Thành công", productList), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<Response>(new Response(false, "Thất bại", null), HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@PostMapping(path = "/getProductByStore")
 	public ResponseEntity<?> getProductByStoreId(@Validated @RequestParam("storeId") Integer storeId, @Validated @RequestParam("isSelling") Boolean isSelling) {

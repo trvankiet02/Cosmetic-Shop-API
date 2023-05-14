@@ -43,7 +43,6 @@ public class AddressController {
 		if (optUser.isEmpty()) {
 			return new ResponseEntity<Response>(new Response(false, "Người dùng không tồn tại", null), HttpStatus.NOT_FOUND); 
 		}
-		
 		if (optAddress.isPresent()) {
 			message = "Cập nhật thông tin địa chỉ thành công";
 			address.setCreateAt(optAddress.get().getCreateAt());
