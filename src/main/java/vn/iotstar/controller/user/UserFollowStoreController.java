@@ -48,7 +48,9 @@ public class UserFollowStoreController {
 					HttpStatus.BAD_REQUEST);
 		} else {
 			Optional<UserFollowStore> optUserFollowStoreList = userFollowStoreRepository.findByUserAndStore(optUser.get(), optStore.get());
-			return new ResponseEntity<Response>(new Response(true, "Thành công", optUserFollowStoreList), HttpStatus.OK);
+			List<UserFollowStore> nullList = new ArrayList<>();
+			nullList.add(optUserFollowStoreList.get());
+			return new ResponseEntity<Response>(new Response(true, "Thành công", nullList), HttpStatus.OK);
 		}
 	}
 	
