@@ -54,6 +54,16 @@ public class AddressController {
 			address.setCreateAt(timestamp);
 			if (optUser.get().getAddresses().size() == 0) {
 				address.setIsDefault(true);
+			} else {
+				Integer isDefaultCount = 0;
+				for (Address a: optUser.get().getAddresses()) {
+					if (a.getIsDefault()) {
+						isDefaultCount++;
+					}
+				}
+				if (isDefaultCount == 0) {
+					address.setIsDefault(true);
+				}	
 			}
 		}
 		if (address.getIsDefault() == true) {
@@ -64,7 +74,8 @@ public class AddressController {
 			}
 		}
 		addressRepository.save(address);
-		return new ResponseEntity<Response>(new Response(true, message, address), HttpStatus.OK);
+		Optional<User> responseUser = userRepository.findById(userId);
+		return new ResponseEntity<Response>(new Response(true, message, responseUser.get()), HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "/{id}")

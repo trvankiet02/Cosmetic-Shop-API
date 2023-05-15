@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Product;
 import vn.iotstar.entity.Style;
 import vn.iotstar.repository.CategoryRepository;
+import vn.iotstar.repository.ProductRepository;
 import vn.iotstar.repository.StyleRepository;
 
 @RestController
@@ -39,6 +41,9 @@ public class CategoryController {
 	
 	@Autowired
 	private StyleRepository styleRepository;
+	
+	@Autowired
+	private ProductRepository productRepository;
 
 	@Autowired
 	private Cloudinary cloudinary;
@@ -52,6 +57,20 @@ public class CategoryController {
 	public ResponseEntity<?> getAllCategory() {
 		//return ResponseEntity.ok().body(categoryRepository.findAll());
 		return new ResponseEntity<Response>(new Response(true, "Thành công", categoryRepository.findAll()), HttpStatus.OK);
+	}
+	
+	@PostMapping(path = "/getCategoryAndStyleOfProduct")
+	public ResponseEntity<?> getCategoryAndStyleIfProduct(@Validated @RequestParam("productId") Integer productId){
+		Optional<Product> optProduct = productRepository.findById(productId);
+		Category category = optProduct.get().getCategory();
+		
+		Style style = optProduct.get().getStyle();
+		List<Style> productStyleList = new ArrayList<>();
+		productStyleList.add(style);
+		category.setStyles(productStyleList);
+		List<Category> productCategoryList = new ArrayList<>();
+		productCategoryList.add(category);
+		return new ResponseEntity<Response>(new Response(true, "Thành công", productCategoryList), HttpStatus.OK);		
 	}
 
 	@PostMapping(path = "/getCategory")
