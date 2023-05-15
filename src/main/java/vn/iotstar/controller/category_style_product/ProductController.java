@@ -196,7 +196,8 @@ public class ProductController {
 	}
 
 	@PostMapping(path = "/addProduct")
-	public ResponseEntity<?> addProduct(@Validated @RequestParam("productName") String productName,
+	public ResponseEntity<?> addProduct(
+			@Validated @RequestParam("productName") String productName,
 			@RequestParam("productImages") MultipartFile[] productImages,
 			@Validated @RequestParam("productPrice") Integer productPrice,
 			@Validated @RequestParam("productPromotionalPrice") Integer promotionalPrice,
@@ -273,7 +274,7 @@ public class ProductController {
 	@PostMapping(path = "/updateProduct")
 	public ResponseEntity<?> updateProduct(@Validated @RequestParam("productId") Integer productId,
 			@Validated @RequestParam("productName") String productName,
-			@RequestParam("productImages") MultipartFile[] productImages,
+			@RequestParam("productImages") List<MultipartFile> productImages,
 			@Validated @RequestParam("productPrice") Integer productPrice,
 			@Validated @RequestParam("productPromotionalPrice") Integer promotionalPrice,
 			@Validated @RequestParam("productDescription") String productDescription,
