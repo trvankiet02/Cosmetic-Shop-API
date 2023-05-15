@@ -198,7 +198,7 @@ public class ProductController {
 	@PostMapping(path = "/addProduct")
 	public ResponseEntity<?> addProduct(
 			@Validated @RequestParam("productName") String productName,
-			@RequestParam("productImages") MultipartFile[] productImages,
+			@RequestParam("productImages") List<MultipartFile> productImages,
 			@Validated @RequestParam("productPrice") Integer productPrice,
 			@Validated @RequestParam("productPromotionalPrice") Integer promotionalPrice,
 			@Validated @RequestParam("productDescription") String productDescription,
