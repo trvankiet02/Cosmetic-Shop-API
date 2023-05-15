@@ -266,7 +266,7 @@ public class ProductController {
 				e.printStackTrace();
 			}
 			// return ResponseEntity.ok().body(product);
-			return new ResponseEntity<Response>(new Response(true, "Thành công", product), HttpStatus.OK);
+			return new ResponseEntity<Response>(new Response(true, "Thành công", optProduct), HttpStatus.OK);
 		}
 	}
 
